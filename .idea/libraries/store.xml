@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="store">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/store/exodus-1.0.0-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/store/openapi-1.0.0-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/store/persistent-entity-store-1.0.0-SNAPSHOT.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/store/utils-1.0.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/store/exodus-1.0.0-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/store/openapi-1.0.0-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/store/persistent-entity-store-1.0.0-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/store/utils-1.0.0-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/core/libs/store" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/core/libs/store" recursive="false" type="SOURCES" />
+  </library>
+</component>

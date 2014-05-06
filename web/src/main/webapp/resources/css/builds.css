@@ -1,0 +1,35 @@
+.bt-container {
+    padding: 5px 20px 5px 20px;
+    width: 90%;
+    max-height: 90%;
+    height: 90%;
+    overflow-y: scroll;
+    overflow-wrap: hyphenate;
+    float: left;
+}
+#back {
+    width: 100%;
+    padding: 0 10px;
+    /*border-top: 1px solid #86a4c3;*/
+    margin: 10px;
+    float: left;
+}
+
+.build {
+    width: 100%;
+    cursor: pointer;
+}
+.build td {
+    padding: 5px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+.art {
+    /*width: 90%;*/
+    /*float: left;*/
+    margin: 5px 0;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+}
+.art:hover, .build:hover {
+    color: #86a4c3 !important;
+}

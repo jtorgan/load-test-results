@@ -1,0 +1,81 @@
+.tc-projects{
+    padding: 5px 10px;
+    overflow: scroll;
+    height: 80%;
+    width: 95%;
+    float: left;
+    border: 1px solid #e1e1e1;
+}
+
+
+.bt-list {
+    max-height: 75%;
+    overflow-y: scroll;
+    border: 1px solid #e1e1e1;
+}
+.right {
+    clear: right;
+}
+
+.bt-item-saved-container {
+    padding: 5px 10px;
+    width: 95%;
+    max-height: 70%;
+    overflow-y: scroll;
+    overflow-wrap: hyphenate;
+    float: left;
+}
+.bt-item-saved {
+}
+.saved-bt-item {
+    margin: 5px 0;
+    padding: 5px 0;
+    width: 100%;
+}
+
+.bt-item-list {
+    clear: right;
+    float: left;
+    margin: 0 1%;
+    padding-top: 10px;
+    width: 98%;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/*<%--buildTypes.jsp--%>*/
+.bt-item {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 5px 0;
+    cursor: pointer;
+}
+
+/*<%--projectTree.tag--%>*/
+.bt-sublist {
+    float: left;
+    padding-left: 30px;
+}
+.sub-project {
+    display: block;
+}
+.hidden {
+    display: none;
+}
+
+
+.start-monitor {
+    background: url("/resources/img/start.png") no-repeat;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+.stop-monitor {
+    background: url("/resources/img/stop.png") no-repeat;
+    width: 18px;
+    cursor: pointer;
+    height: 18px;
+}
+
+.edit-bt {
+    cursor: pointer;
+}

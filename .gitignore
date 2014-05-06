@@ -1,0 +1,9 @@
+apache-tomcat-7.0.52/*
+core/out
+core/src/_aamm
+core/tests
+web/target
+core/.idea/scopes/scope_settings.xml
+core/temp
+web/src/test
+out/

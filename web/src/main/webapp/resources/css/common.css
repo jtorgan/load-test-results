@@ -1,0 +1,19 @@
+.frame {
+    float: left;
+    width: 47%;
+    margin: 0 1%;
+}
+.frame-title {
+    font-size: 110%;
+    border-bottom: 1px solid #86a4c3;
+    margin-bottom: 1%;
+    width: 95%;
+    float: left;
+    padding: 1%;
+}
+.remove {
+    background: url("/resources/img/remove.png") no-repeat;
+    width: 18px;
+    cursor: pointer;
+    height: 18px;
+}
