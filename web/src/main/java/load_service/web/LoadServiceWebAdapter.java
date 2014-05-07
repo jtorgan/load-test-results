@@ -26,7 +26,7 @@ public class LoadServiceWebAdapter implements LoadService {
      * @throws Exception
      */
     public void initIt() throws Exception {
-        myService = LoadServiceFactory.getDefault();
+        myService = LoadServiceFactory.getDefault("c:\\_DB_\\");
         System.out.println("Load Service: init entity store");
     }
 
@@ -116,8 +116,8 @@ public class LoadServiceWebAdapter implements LoadService {
     }
 
     @Override
-    public void countStatistic(@NotNull BuildID buildID, @NotNull String artifactName, @NotNull StatisticProperties properties) throws FileFormatException {
-        myService.countStatistic(buildID, artifactName, properties);
+    public boolean countStatistic(@NotNull BuildID buildID, @NotNull String artifactName, @NotNull StatisticProperties properties) {
+        return myService.countStatistic(buildID, artifactName, properties);
     }
 
     @Override
@@ -130,13 +130,21 @@ public class LoadServiceWebAdapter implements LoadService {
         return myService.isStatisticCalculated(buildID, artifactName);
     }
 
+    @NotNull
     @Override
-    public List<String> getArtifactsWithStatistic(@NotNull BuildID buildID) {
-        return myService.getArtifactsWithStatistic(buildID);
+    public Map<String, Boolean> getStatMarkedArtifacts(@NotNull BuildID buildID) {
+        return myService.getStatMarkedArtifacts(buildID);
     }
 
+    @NotNull
     @Override
-    public List<String> getArtifactsWithoutStatistic(@NotNull BuildID buildID) {
-        return myService.getArtifactsWithoutStatistic(buildID);
+    public List<String> getArtifactsWithStat(@NotNull BuildID buildID) {
+        return myService.getArtifactsWithStat(buildID);
+    }
+
+    @NotNull
+    @Override
+    public List<String> getArtifactsWithoutStat(@NotNull BuildID buildID) {
+        return myService.getArtifactsWithoutStat(buildID);
     }
 }

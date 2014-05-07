@@ -68,6 +68,8 @@ public enum BaseMetrics implements Metric {
         public MetricCounter getCounter(@NotNull final TestID testID) {
             return new MetricCounter.SingleValueMetric() {
                 private final boolean total = TOTAL_NAME.equals(testID.getTestName());
+                private long value = Integer.MAX_VALUE;
+
 
                 @Override
                 public long getBuildValue() {
@@ -94,6 +96,7 @@ public enum BaseMetrics implements Metric {
             return new MetricCounter.SingleValueMetric() {
                 private final boolean total = TOTAL_NAME.equals(testID.getTestName());
                 private List<Long> values = new ArrayList<>();
+
                 @Override
                 public long getBuildValue() {
                     Collections.sort(values);

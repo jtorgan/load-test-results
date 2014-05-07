@@ -33,5 +33,8 @@
         <constructor-arg ref="loadServiceWebAdapter"/>
     </bean>
 
+    <bean id="statisticController" class="load_service.web.controllers.StatisticController">
+        <constructor-arg ref="loadServiceWebAdapter"/>
+    </bean>
 
 </beans>

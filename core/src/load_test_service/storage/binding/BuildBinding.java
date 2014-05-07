@@ -57,6 +57,11 @@ public class BuildBinding {
         final EntityIterable entDependencies = entity.getLinks(BuildEntityManager.LINK_TO_DEPENDENCIES);
         if (!entDependencies.isEmpty()) {
             for(Entity entDependency : entDependencies) {
+                String dbtID = (String) entity.getProperty(BuildTypeEntityManager.PROPERTY_BT_ID);
+                String did = (String) entity.getProperty(BuildEntityManager.PROPERTY_BUILD_ID);
+                if (dbtID == null || did == null) {
+                    System.out.println("NULL POINTER EXCE: for test id " + id);
+                }
                 DependencyBuild dependency = entityToDependencyBuild(entDependency);
                 build.addDependency(dependency);
             }

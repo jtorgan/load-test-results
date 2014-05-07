@@ -14,21 +14,27 @@ $(function() {
             url: "/builds/info",
             data: {buildTypeID: buildTypeID, buildID: buildID}
         }).done(function (data) {
-                $("#build-info").html(data);
+                $("#buildInfo").html(data);
                 currentBuild = buildID;
             });
+
         $.ajax({
             type: "get",
-            url: "/builds/artifacts",
+            url: "/statistic/statForm",
             data: {buildTypeID: buildTypeID, buildID: buildID}
         }).done(function (data) {
-                $("#artifacts").html(data);
+                $("#statForm").html(data);
                 currentBuild = buildID;
             });
-    });
 
-    $('#statCalc').bind('submit' ,function() {
-
+        $.ajax({
+            type: "get",
+            url: "/statistic/artWithStat",
+            data: {buildTypeID: buildTypeID, buildID: buildID}
+        }).done(function (data) {
+                $("#artWithStat").html(data);
+                currentBuild = buildID;
+            });
     });
 });
 
@@ -48,7 +54,8 @@ function removeBuild(index, div, bID, btID) {
 //          empty if this info shown
             if (bID == currentBuild) {
                 $("#artifacts").empty();
-                $("#build-info").empty();
+                $("#statForm").empty();
+                $("#artWithStat").empty();
             }
         });
 }
@@ -66,7 +73,7 @@ function calculateStatistic(bID, btID) {
 
     $.ajax({
         type: "post",
-        url: "/builds/calculateStatistic",
+        url: "/statistic/calculate",
         traditional: true,
         data: {
             buildTypeID: btID,
@@ -77,7 +84,7 @@ function calculateStatistic(bID, btID) {
             total: total
         },
         dataType: "json"
-    }).done(function () {
-            alert("Ready!");
+    }).done(function (isReady) {
+            alert(isReady);
     });
 }

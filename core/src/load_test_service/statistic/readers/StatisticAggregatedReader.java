@@ -41,11 +41,11 @@ public class StatisticAggregatedReader extends FileReader {
         Item item = new Item(line, properties);
 
         TestID testID = new TestIDImpl(item.getThreadGroup(), item.getTestName());
-        runCounters(testID, samplers);
+        runCounters(testID, item, samplers);
 
         if (properties.isCalculateTotal()) {
             testID = new TestIDImpl(item.getThreadGroup(), BaseMetrics.TOTAL_NAME);
-            runCounters(testID, totals);
+            runCounters(testID, item, totals);
         }
 
         if (properties.isCheckAssertions() && !item.isSuccessful()) {
@@ -77,7 +77,7 @@ public class StatisticAggregatedReader extends FileReader {
         return failedItems;
     }
 
-    private void runCounters(TestID testID, Map<TestID, List<MetricCounter>> counters) {
+    private void runCounters(TestID testID, Item item, Map<TestID, List<MetricCounter>> counters) {
         List<MetricCounter> testCounters = counters.get(testID);
         if (testCounters == null) {
             testCounters = new ArrayList<>(metrics.length);
@@ -85,6 +85,9 @@ public class StatisticAggregatedReader extends FileReader {
                 testCounters.add(metricDescriptor.getCounter(testID));
             }
             counters.put(testID, testCounters);
+        }
+        for (MetricCounter counter : testCounters) {
+            counter.processItem(item);
         }
     }
 }

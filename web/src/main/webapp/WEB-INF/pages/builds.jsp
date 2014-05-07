@@ -28,7 +28,7 @@
     <a id="back" href='${baseURL}'>< Back</a>
 
     <input type="hidden" id="btID" value="${buildTypeID}">
-    <div class="frame" style="border-right: 1px solid #86a4c3; max-height: 70%; height: 70%; padding-bottom: 5px">
+    <div class="frame" style="border-right: 1px solid #86a4c3; max-height: 90%; height: 90%; padding-bottom: 5px">
         <div class="frame-title">Builds (<span id="count">${count}</span>) </div>
         <div class="bt-container">
             <table style="width: 100%; border-spacing: 0; max-height: 100%" id="builds">
@@ -62,9 +62,14 @@
             </table>
         </div>
     </div>
-    <div class="frame" id="build-info" style="max-height: 70%; height: 70%; padding-bottom: 5px; overflow-y: scroll">
-    </div>
-    <div class="frame" id="artifacts" style="border-top:  1px solid #86a4c3; max-height: 20%; width: 95%; height: 20%">
+
+
+    <div class="frame" style="max-height: 90%; height: 90%; padding-bottom: 5px; overflow: visible">
+        <div id="buildInfo" class="frame-block"></div>
+
+        <div id="statForm" class="frame-block"></div>
+
+        <div id="artWithStat" class="frame-block"></div>
     </div>
 </body>
 </html>

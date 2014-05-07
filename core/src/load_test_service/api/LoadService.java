@@ -133,7 +133,7 @@ public interface LoadService {
      * @param artifactName
      * @param properties
      */
-    void countStatistic(@NotNull final BuildID buildID, @NotNull final String artifactName, @NotNull final StatisticProperties properties) throws FileFormatException;
+    boolean countStatistic(@NotNull final BuildID buildID, @NotNull final String artifactName, @NotNull final StatisticProperties properties);
 
     /**
      * Return RPS and SRT chart values
@@ -146,9 +146,15 @@ public interface LoadService {
 
 
     boolean isStatisticCalculated(@NotNull final BuildID buildID, @NotNull final String artifactName);
-    List<String> getArtifactsWithStatistic(@NotNull final BuildID buildID);
-    List<String> getArtifactsWithoutStatistic(@NotNull final BuildID buildID);
 
+    @NotNull
+    Map<String, Boolean> getStatMarkedArtifacts(@NotNull final BuildID buildID);
+
+    @NotNull
+    List<String> getArtifactsWithStat(@NotNull final BuildID buildID);
+
+    @NotNull
+    List<String> getArtifactsWithoutStat(@NotNull final BuildID buildID);
 
 //    @Nullable
 //    List<TestID> getAllTests(@NotNull final BuildID buildID);

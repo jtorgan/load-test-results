@@ -21,8 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -38,8 +37,8 @@ public class LoadServiceImpl implements LoadService, TCAnalyzerInnerQuery {
 
     private final ConcurrentMap<String, TCAnalyzer> monitoring;
 
-    public LoadServiceImpl() {
-        store = PersistentEntityStores.newInstance("c:\\_DB_\\");
+    public LoadServiceImpl(String location) {
+        store = PersistentEntityStores.newInstance(location);
 
         buildManager = new BuildEntityManager();
         buildTypeManager = new BuildTypeEntityManager();
@@ -271,16 +270,24 @@ public class LoadServiceImpl implements LoadService, TCAnalyzerInnerQuery {
     }
 
     @Override
-    public void countStatistic(@NotNull final BuildID buildID, @NotNull final String artifactName, @NotNull final StatisticProperties properties) {
-        store.executeInTransaction(new StoreTransactionalExecutable() {
+    public boolean countStatistic(@NotNull final BuildID buildID, @NotNull final String artifactName, @NotNull final StatisticProperties properties){
+        return store.computeInTransaction(new StoreTransactionalComputable<Boolean>() {
             @Override
-            public void execute(@NotNull StoreTransaction txn) {
+            public Boolean compute(@NotNull StoreTransaction txn) {
                 Entity build = buildManager.getBuildEntity(txn, buildID);
                 if (build != null) {
                     InputStream artifact = build.getBlob(artifactName);
-                    if (artifact != null)
-                        statistic.countStatistic(txn, buildID, build, artifact, properties);
+                    if (artifact != null) {
+                        try {
+                            statistic.countStatistic(txn, buildID, build, artifact, properties);
+                            build.setProperty(artifactName, true);
+                            return true;
+                        } catch (FileFormatException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
+                return false;
             }
         });
     }
@@ -296,19 +303,78 @@ public class LoadServiceImpl implements LoadService, TCAnalyzerInnerQuery {
 
 
     @Override
-    public boolean isStatisticCalculated(@NotNull BuildID buildID, @NotNull String artifactName) {
-        return false;
+    public boolean isStatisticCalculated(@NotNull final BuildID buildID, @NotNull final String artifactName) {
+        return store.computeInReadonlyTransaction(new StoreTransactionalComputable<Boolean>() {
+            @Override
+            public Boolean compute(@NotNull StoreTransaction txn) {
+                Entity build = buildManager.getBuildEntity(txn, buildID);
+                return build != null && build.getProperty(artifactName) != null;
+            }
+        });
     }
 
     @Override
-    public List<String> getArtifactsWithStatistic(@NotNull BuildID buildID) {
-        return null;
+    @NotNull
+    public Map<String, Boolean> getStatMarkedArtifacts(@NotNull final BuildID buildID) {
+        return store.computeInReadonlyTransaction(new StoreTransactionalComputable<Map<String, Boolean>>() {
+            @Override
+            public Map<String, Boolean> compute(@NotNull StoreTransaction txn) {
+                TestBuild build = buildManager.getBuild(txn, buildID);
+                Entity buildEntity = buildManager.getBuildEntity(txn, buildID);
+                if (build == null || buildEntity == null) return Collections.emptyMap();
+                Collection<String> artifacts = build.getArtifacts();
+                if (artifacts == null || artifacts.isEmpty()) return Collections.emptyMap();
+
+                Map<String, Boolean> markedArtifacts = new HashMap<>();
+                for (String art : artifacts)
+                    markedArtifacts.put(art, buildEntity.getProperty(art) != null);
+                return markedArtifacts;
+            }
+        });
     }
 
+    @NotNull
     @Override
-    public List<String> getArtifactsWithoutStatistic(@NotNull BuildID buildID) {
-        return null;
+    public List<String> getArtifactsWithStat(@NotNull final BuildID buildID) {
+        return store.computeInReadonlyTransaction(new StoreTransactionalComputable<List<String>>() {
+            @Override
+            public List<String> compute(@NotNull StoreTransaction txn) {
+                TestBuild build = buildManager.getBuild(txn, buildID);
+                Entity buildEntity = buildManager.getBuildEntity(txn, buildID);
+                if (build == null || buildEntity == null) return Collections.emptyList();
+                Collection<String> artifacts = build.getArtifacts();
+                if (artifacts == null || artifacts.isEmpty()) return Collections.emptyList();
+
+                List<String> markedArtifacts = new ArrayList<>();
+                for (String art : artifacts)
+                    if (buildEntity.getProperty(art) != null)
+                        markedArtifacts.add(art);
+                return markedArtifacts;
+            }
+        });
     }
+
+    @NotNull
+    @Override
+    public List<String> getArtifactsWithoutStat(@NotNull final BuildID buildID) {
+        return store.computeInReadonlyTransaction(new StoreTransactionalComputable<List<String>>() {
+            @Override
+            public List<String> compute(@NotNull StoreTransaction txn) {
+                TestBuild build = buildManager.getBuild(txn, buildID);
+                Entity buildEntity = buildManager.getBuildEntity(txn, buildID);
+                if (build == null || buildEntity == null) return Collections.emptyList();
+                Collection<String> artifacts = build.getArtifacts();
+                if (artifacts == null || artifacts.isEmpty()) return Collections.emptyList();
+
+                List<String> markedArtifacts = new ArrayList<>();
+                for (String art : artifacts)
+                    if (buildEntity.getProperty(art) == null)
+                        markedArtifacts.add(art);
+                return markedArtifacts;
+            }
+        });
+    }
+
 
     private InputStream getArtifact(final BuildID buildID, final String artifactName) {
         return store.computeInReadonlyTransaction(new StoreTransactionalComputable<InputStream>() {

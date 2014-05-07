@@ -4,8 +4,8 @@
 <%--@elvariable id="build" type="load_test_service.api.model.TestBuild"--%>
 <%--@elvariable id="artifacts" type="java.util.Collection<java.lang.String>"--%>
 
-<div class="frame-title" style="display: block; float: left">Dependencies in build # ${build.ID.buildID}</div>
-<div id="dep-list" style="height: 40%; display: block; float: left; width: 95%; padding: 1%">
+<div class="frame-title">Dependencies in build # ${build.ID.buildID}</div>
+<div id="dep-list" class="frame-content">
     <table style="display: inline-block; width: 100%; max-height: 100%">
         <c:forEach items="${build.dependencyList}" var="dependency">
             <tr style="padding: 10px 0 5px 0; border-bottom: 1px solid #cccccc">
