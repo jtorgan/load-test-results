@@ -7,12 +7,13 @@ import load_test_service.api.statistic.StatisticProperties;
 import load_test_service.api.statistic.metrics.Metric;
 import load_test_service.statistic.BaseMetrics;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,7 +57,7 @@ public class StatisticController {
     }
 
     @RequestMapping(value = "/calculate", method = RequestMethod.POST)
-    public @ResponseBody boolean calculateStatistic(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
+    public ResponseEntity calculateStatistic(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
                             @RequestParam(value = "buildID", required = true) String buildID,
                             @RequestParam(value = "metrics", required = true) String[] metrics,
                             @RequestParam(value = "artifact", required = true) String artifact,
@@ -77,6 +78,18 @@ public class StatisticController {
         props.useTestGroups(threadGroup);
         props.calculateTotal(total);
 
-        return service.countStatistic(id, artifact, props);
+        if (service.countStatistic(id, artifact, props)) {
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @RequestMapping(value = "/showStat", method = RequestMethod.GET)
+    public String showStat(@RequestParam(value = "buildTypeID", required = true) String buildTypeID, @RequestParam(value = "buildID", required = true) String buildID,
+                           @RequestParam(value = "artifact", required = true) String artifact,
+                           ModelMap model) {
+		//todo: show page with statistic
+        BuildID id = new BuildID(buildTypeID, buildID);
+        return "statistic";
     }
 }

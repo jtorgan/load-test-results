@@ -9,34 +9,45 @@ $(function() {
     $('td.clickable').bind('click' ,function() {
         var buildID = $(this).closest("tr").attr("id");
         var buildTypeID = $("#btID").val();
-        $.ajax({
-            type: "get",
-            url: "/builds/info",
-            data: {buildTypeID: buildTypeID, buildID: buildID}
-        }).done(function (data) {
-                $("#buildInfo").html(data);
-                currentBuild = buildID;
-            });
-
-        $.ajax({
-            type: "get",
-            url: "/statistic/statForm",
-            data: {buildTypeID: buildTypeID, buildID: buildID}
-        }).done(function (data) {
-                $("#statForm").html(data);
-                currentBuild = buildID;
-            });
-
-        $.ajax({
-            type: "get",
-            url: "/statistic/artWithStat",
-            data: {buildTypeID: buildTypeID, buildID: buildID}
-        }).done(function (data) {
-                $("#artWithStat").html(data);
-                currentBuild = buildID;
-            });
+        loadBuildInfo(buildID, buildTypeID);
+        loadStatForm(buildID, buildTypeID);
+        loadArtifacts(buildID, buildTypeID);
     });
 });
+
+function loadBuildInfo(buildID, buildTypeID) {
+    $.ajax({
+        type: "get",
+        url: "/builds/info",
+        data: {buildTypeID: buildTypeID, buildID: buildID}
+    }).done(function (data) {
+        $("#buildInfo").html(data);
+        currentBuild = buildID;
+    });
+}
+
+function loadStatForm(buildID, buildTypeID) {
+    $.ajax({
+        type: "get",
+        url: "/statistic/statForm",
+        data: {buildTypeID: buildTypeID, buildID: buildID}
+    }).done(function (data) {
+        $("#statForm").html(data);
+        currentBuild = buildID;
+    });
+}
+
+function loadArtifacts(buildID, buildTypeID) {
+    $.ajax({
+        type: "get",
+        url: "/statistic/artWithStat",
+        data: {buildTypeID: buildTypeID, buildID: buildID}
+    }).done(function (data) {
+        $("#artWithStat").html(data);
+        currentBuild = buildID;
+    });
+}
+
 
 function removeBuild(index, div, bID, btID) {
     $.ajax({
@@ -53,7 +64,7 @@ function removeBuild(index, div, bID, btID) {
 
 //          empty if this info shown
             if (bID == currentBuild) {
-                $("#artifacts").empty();
+                $("#buildInfo").empty();
                 $("#statForm").empty();
                 $("#artWithStat").empty();
             }
@@ -83,8 +94,13 @@ function calculateStatistic(bID, btID) {
             threadGroup: threadGroup,
             total: total
         },
-        dataType: "json"
-    }).done(function (isReady) {
-            alert(isReady);
+        dataType: "json",
+        success: function(){
+            loadArtifacts(bID, btID);
+            loadStatForm(bID, btID);
+        },
+        error: function(){
+            alert('failure');
+        }
     });
 }

@@ -11,8 +11,14 @@
     .stat-form {
 
     }
+    .stat-form td {
+        vertical-align: top;
+        padding: 0 10px 0 5px;
+    }
+
     .stat-form th {
         text-align: left;
+        padding: 0 10px 0 5px;
     }
     .setting-item {
 
