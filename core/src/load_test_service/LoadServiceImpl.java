@@ -3,6 +3,7 @@ package load_test_service;
 import jetbrains.exodus.database.*;
 import load_test_service.api.LoadService;
 import load_test_service.api.exeptions.FileFormatException;
+import load_test_service.api.exeptions.LinkNotFound;
 import load_test_service.api.model.BuildID;
 import load_test_service.api.model.BuildType;
 import load_test_service.api.model.TestBuild;
@@ -15,6 +16,8 @@ import load_test_service.storage.entities.BuildEntityManager;
 import load_test_service.storage.entities.BuildTypeEntityManager;
 import load_test_service.storage.entities.StatisticEntityManager;
 import load_test_service.storage.queries.TCAnalyzerInnerQuery;
+import load_test_service.storage.schema.ArtifactEntity;
+import load_test_service.storage.schema.BuildEntity;
 import load_test_service.teamcity.RESTHttpClient;
 import load_test_service.teamcity.TCAnalyzer;
 import org.jetbrains.annotations.NotNull;
@@ -276,14 +279,20 @@ public class LoadServiceImpl implements LoadService, TCAnalyzerInnerQuery {
             public Boolean compute(@NotNull StoreTransaction txn) {
                 Entity build = buildManager.getBuildEntity(txn, buildID);
                 if (build != null) {
-                    InputStream artifact = build.getBlob(artifactName);
-                    if (artifact != null) {
-                        try {
-                            statistic.countStatistic(txn, buildID, build, artifact, properties);
-                            build.setProperty(artifactName, true);
-                            return true;
-                        } catch (FileFormatException e) {
-                            e.printStackTrace();
+                    for (Entity artifact : build.getLinks(BuildEntity.Link.TO_ARTIFACT.name())) {
+                        String entityName = (String) artifact.getProperty(ArtifactEntity.Property.NAME.name());
+                        if (entityName != null && entityName.equals(artifactName)) {
+                            InputStream content = artifact.getBlob(ArtifactEntity.Blob.CONTENT.name());
+                            Entity buildType = build.getLink(BuildEntity.Link.TO_BUILD_TYPE.name());
+                            if (content != null && buildType != null) {
+                                try {
+                                    statistic.countStatistic(txn, build, content, properties);
+                                    artifact.setProperty(ArtifactEntity.Property.IS_PROCESSED.name(), true);
+                                    return true;
+                                } catch (FileFormatException | LinkNotFound e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                     }
                 }

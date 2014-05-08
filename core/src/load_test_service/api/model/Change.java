@@ -2,6 +2,9 @@ package load_test_service.api.model;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * NOT an ENTITY: only as string blob, used in Dependency Build
+ */
 public class Change implements Comparable<Change> {
     private String author;
     private String revision;

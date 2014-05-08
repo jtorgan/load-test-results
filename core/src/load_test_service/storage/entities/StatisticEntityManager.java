@@ -4,6 +4,7 @@ import jetbrains.exodus.database.Entity;
 import jetbrains.exodus.database.EntityIterable;
 import jetbrains.exodus.database.StoreTransaction;
 import load_test_service.api.exeptions.FileFormatException;
+import load_test_service.api.exeptions.LinkNotFound;
 import load_test_service.api.model.BuildID;
 import load_test_service.api.statistic.StatisticProperties;
 import load_test_service.api.statistic.TestBuildStatistic;
@@ -12,118 +13,123 @@ import load_test_service.api.statistic.metrics.MetricCounter;
 import load_test_service.statistic.readers.RawDataReader;
 import load_test_service.statistic.readers.StatisticAggregatedReader;
 import load_test_service.storage.queries.StatisticQuery;
+import load_test_service.storage.schema.BuildEntity;
+import load_test_service.storage.schema.BuildTypeEntity;
+import load_test_service.storage.schema.SampleEntity;
+import load_test_service.storage.schema.SampleValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class StatisticEntityManager implements StatisticQuery {
-//  ENTITY TYPES
-    public static final String SAMPLE_ENTITY_TYPE = "sampler"; // test sampler
-    public static final String TOTAL_THREAD_GROUP_ENTITY_TYPE = "totalTG"; // total by thread group
 
-    public static final String RESPONSE_CODE_ENTITY_TYPE = "respCodes"; // test sampler
-
-
-//  PROPERTIES
-    public static final String PROPERTY_TEST_NAME = "tsName";
-    public static final String PROPERTY_THREAD_GROUP_NAME = "ttgName";
-
-//  BLOBS
-
-//  LINKS
-    public static final String LINK_TO_STAT_RESP_CODES = "stat-to-resp-codes";
-    public static final String LINK_TO_STAT_SAMPLER = "to-sample";
-    public static final String LINK_TO_STAT_TOTAL = "to-total";
-
-    public void countStatistic(@NotNull StoreTransaction txn, @NotNull final BuildID buildID, @NotNull final Entity build,
-                               @NotNull final InputStream artifact, @NotNull final StatisticProperties properties) throws FileFormatException {
+    /**
+     * Calculate statistic and save it to store
+     * @param txn
+     * @param artifact
+     * @param properties
+     * @throws FileFormatException
+     */
+//  todo: is need to add link build => sample value
+    public void countStatistic(@NotNull StoreTransaction txn, @NotNull final Entity build,
+                               @NotNull final InputStream artifact, @NotNull final StatisticProperties properties) throws FileFormatException, LinkNotFound {
+        Entity buildType = build.getLink(BuildEntity.Link.TO_BUILD_TYPE.name());
+        if (buildType == null)
+            throw new LinkNotFound(BuildEntity.Link.TO_BUILD_TYPE.name(), build);
         StatisticAggregatedReader reader = new StatisticAggregatedReader(properties);
         reader.processFile(artifact);
-        Map<TestID, List<MetricCounter>> tests = reader.getValuesBySamplers();
-        for(TestID testID : tests.keySet()) {
-            Entity test = txn.newEntity(SAMPLE_ENTITY_TYPE);
-            test.setProperty(PROPERTY_TEST_NAME, testID.getTestName());
 
-            test.setProperty(BuildEntityManager.PROPERTY_BUILD_ID, buildID.getBuildID());
-            test.setProperty(BuildTypeEntityManager.PROPERTY_BT_ID, buildID.getBuildTypeID());
-
-            if (!testID.getThreadGroup().isEmpty())
-                test.setProperty(PROPERTY_THREAD_GROUP_NAME, testID.getThreadGroup());
-
-            setStatisticValues(txn, test, tests.get(testID));
-
-            build.setLink(LINK_TO_STAT_SAMPLER, test);
+//        create existed samples map
+        Map<String, Entity> existedSamples = new HashMap<>();
+        for (Entity sample : buildType.getLinks(BuildTypeEntity.Link.TO_SAMPLES.name())) {
+            String key = sample.getProperty(SampleEntity.Property.THREAD_GROUP.name()) + (String) sample.getProperty(SampleEntity.Property.SAMPLE_NAME.name());
+            existedSamples.put(key, sample);
         }
+
+        saveTestValues(txn, buildType, build, existedSamples, reader.getValuesBySamplers());
         if (properties.isCalculateTotal()) {
-            Map<TestID, List<MetricCounter>> totals = reader.getTotalValuesByThreadGroups();
-            for(TestID testID : totals.keySet()) {
-                Entity test = txn.newEntity(TOTAL_THREAD_GROUP_ENTITY_TYPE);
+            saveTestValues(txn, buildType, build, existedSamples, reader.getTotalValuesByThreadGroups());
+        }
+    }
 
-                if (!testID.getThreadGroup().isEmpty())
-                    test.setProperty(PROPERTY_THREAD_GROUP_NAME, testID.getThreadGroup());
+    private void saveTestValues(StoreTransaction txn, Entity buildType, Entity build, Map<String, Entity> existedSamples, Map<TestID, List<MetricCounter>> tests) {
+        for(TestID testID : tests.keySet()) {
+            String key = testID.getThreadGroup() + testID.getTestName();
+            Entity sample = existedSamples.get(key);
+            if (sample == null) {
+                sample = txn.newEntity(SampleEntity.TYPE);
+                sample.setProperty(SampleEntity.Property.THREAD_GROUP.name(), testID.getThreadGroup());
+                sample.setProperty(SampleEntity.Property.SAMPLE_NAME.name(), testID.getTestName());
 
-                test.setProperty(BuildEntityManager.PROPERTY_BUILD_ID, buildID.getBuildID());
-                test.setProperty(BuildTypeEntityManager.PROPERTY_BT_ID, buildID.getBuildTypeID());
+                buildType.addLink(BuildTypeEntity.Link.TO_SAMPLES.name(), sample);
+            }
 
-                setStatisticValues(txn, test, totals.get(testID));
+            for (MetricCounter metric : tests.get(testID)) {
+                if (metric instanceof MetricCounter.SingleValueMetric) { // Min, Max, Average, 90Line - with one value
+                    MetricCounter.SingleValueMetric singleMetric = (MetricCounter.SingleValueMetric) metric;
+                    Entity value = createValueEntity(txn, metric.getKey(), singleMetric.getBuildValue(), false, null);
 
-                build.setLink(LINK_TO_STAT_TOTAL, test);
+                    value.addLink(SampleValue.Link.TO_SAMPLE.name(), sample);
+
+                    sample.addLink(SampleEntity.Link.TO_SAMPLE_VALUE.name(), value);
+                    build.addLink(BuildEntity.Link.TO_SAMPLE_VALUE.name(), value);
+
+                } else if (metric instanceof MetricCounter.MultipleValueMetric) { // Response codes - with several values
+                    MetricCounter.MultipleValueMetric multipleValueMetric = (MetricCounter.MultipleValueMetric) metric;
+                    Map<String, Long> subValues = multipleValueMetric.getBuildValues();
+                    for (String subKey : subValues.keySet()) {
+                        Entity value = createValueEntity(txn, metric.getKey(), subValues.get(subKey), true, subKey);
+
+                        value.addLink(SampleValue.Link.TO_SAMPLE.name(), sample);
+
+                        sample.addLink(SampleEntity.Link.TO_SAMPLE_VALUE.name(), value);
+                        build.addLink(BuildEntity.Link.TO_SAMPLE_VALUE.name(), value);
+                    }
+                }
             }
         }
     }
+
+    private Entity createValueEntity(StoreTransaction txn, String metric, long value, boolean hasSubMetric, String subMetric) {
+        Entity sampleValue = txn.newEntity(SampleValue.TYPE);
+        sampleValue.setProperty(SampleValue.Property.METRIC.name(), metric);
+
+        if (hasSubMetric)
+            sampleValue.setProperty(SampleValue.Property.SUB_METRIC.name(), subMetric);
+
+        sampleValue.setBlobString(SampleValue.Blob.VALUE.name(), String.valueOf(value));
+        return sampleValue;
+    }
+
+
+
+
+
+
 
     public void deleteBuildStatistic(@NotNull final Entity build) {
-        EntityIterable samplers = build.getLinks(LINK_TO_STAT_SAMPLER);
-        if (!samplers.isEmpty()) {
-            for (Entity sampler : samplers) {
-                deleteLinkedStatisticValues(sampler);
-                sampler.delete();
+        EntityIterable values = build.getLinks(BuildEntity.Link.TO_SAMPLE_VALUE.name());
+        if (!values.isEmpty()) {
+            for (Entity value : values) {
+                Entity sample = value.getLink(SampleValue.Link.TO_SAMPLE.name());
+                if (sample != null) {
+                    sample.deleteLink(SampleEntity.Link.TO_SAMPLE_VALUE.name(), value);
+                    if (sample.getLinks(SampleEntity.Link.TO_SAMPLE_VALUE.name()).isEmpty()) {
+                        // if sample has not values - remove sample
+                        Entity buildType = sample.getLink(SampleEntity.Link.TO_BUILD_TYPE.name());
+                        if (buildType != null) {
+                            buildType.deleteLink(BuildTypeEntity.Link.TO_SAMPLES.name(), sample);
+                        }
+                        sample.delete();
+                    }
+                }
+                build.deleteLink(BuildEntity.Link.TO_SAMPLE_VALUE.name(), value);
+                value.delete();
             }
         }
-        build.deleteLinks(LINK_TO_STAT_SAMPLER);
-
-        EntityIterable totals = build.getLinks(LINK_TO_STAT_TOTAL);
-        if (!totals.isEmpty()) {
-            for (Entity total : totals) {
-                deleteLinkedStatisticValues(total);
-                total.delete();
-            }
-        }
-        build.deleteLinks(LINK_TO_STAT_TOTAL);
-
-    }
-
-//  TODO: queries to extract statistic public void getBuildStatistic
-
-
-    private void setStatisticValues(StoreTransaction txn, Entity test, List<MetricCounter> counters) {
-        for (MetricCounter counter : counters) {
-            String key = counter.getKey();
-            if (counter instanceof MetricCounter.SingleValueMetric) {
-                test.setProperty(key, ((MetricCounter.SingleValueMetric) counter).getBuildValue());
-                continue;
-            }
-            if (counter instanceof MetricCounter.MultipleValueMetric) {
-                addLinkedStatisticValues(txn, test, ((MetricCounter.MultipleValueMetric) counter).getBuildValues());
-            }
-        }
-    }
-
-    private void addLinkedStatisticValues(StoreTransaction txn, Entity test, Map<String, Long> values) {
-        Entity respCodes = txn.newEntity(RESPONSE_CODE_ENTITY_TYPE);
-        for (String subKey : values.keySet()) {
-            respCodes.setProperty(subKey, values.get(subKey));
-        }
-        test.addLink(LINK_TO_STAT_RESP_CODES, respCodes);
-    }
-
-    private void deleteLinkedStatisticValues(Entity test) {
-        Entity resCode = test.getLink(RESPONSE_CODE_ENTITY_TYPE);
-        if (resCode != null)
-            resCode.delete();
-        test.deleteLinks(RESPONSE_CODE_ENTITY_TYPE);
     }
 
     public Map<TestID, TestBuildStatistic> getRawStatistic(@NotNull InputStream artifact) throws FileFormatException {
@@ -133,4 +139,7 @@ public class StatisticEntityManager implements StatisticQuery {
         return reader.getTests();
     }
 
+    public void getCountedStatistic(@NotNull StoreTransaction txn, @NotNull final BuildID buildID, @NotNull final Entity build) {
+
+    }
 }

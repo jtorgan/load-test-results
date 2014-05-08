@@ -29,7 +29,8 @@ public class BuildID implements Comparable<BuildID>{
     @Override
     public int hashCode() {
 // todo: replace temp hashcode; 
-// todo: set everyplace buildId as long type like at TeamCity        int result = 1;
+// todo: set everyplace buildId as long type like at TeamCity
+        int result = 1;
         result = 17 * result + buildTypeID.length();
         result = 17 * result + Integer.valueOf(buildID) ;
         return result;

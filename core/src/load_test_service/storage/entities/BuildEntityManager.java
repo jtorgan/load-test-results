@@ -3,40 +3,21 @@ package load_test_service.storage.entities;
 import jetbrains.exodus.database.Entity;
 import jetbrains.exodus.database.EntityIterable;
 import jetbrains.exodus.database.StoreTransaction;
-import jetbrains.exodus.database.impl.bindings.StringBinding;
 import load_test_service.api.model.BuildID;
 import load_test_service.api.model.TestBuild;
 import load_test_service.storage.binding.BuildBinding;
-import load_test_service.storage.binding.CollectionConverter;
 import load_test_service.storage.queries.BuildQuery;
+import load_test_service.storage.schema.ArtifactEntity;
+import load_test_service.storage.schema.BuildEntity;
+import load_test_service.storage.schema.BuildTypeEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * Created by Yuliya.Torhan on 4/23/14.
- */
 public class BuildEntityManager implements BuildQuery {
-//  ENTITY TYPES
-    public static final String TEST_ENTITY_TYPE = "TestBuild";
-    public static final String DEP_ENTITY_TYPE = "DependencyBuild";
-
-//  PROPERTIES
-    public static final String PROPERTY_BUILD_ID = "buildID";
-    public static final String PROPERTY_BUILD_STATUS = "status";
-    public static final String PROPERTY_BUILD_FINISH_DATE = "finish";
-    public static final String PROPERTY_BUILD_CHANGES = "changes";
-
-//    BLOBS
-    public static final String BLOB_BUILD_NUMBER = "buildNumber";
-    public static final String BLOB_ARTIFACT_NAMES = "artifactNames";
-
-//  LINKS
-    public static final String LINK_BUILD_TO_BUILD_TYPE = "build-bt";
-    public static final String LINK_TO_DEPENDENCIES = "build-deps";
-    public static final String LINK_DEPENDENCY_TO_BUILD = "dep-build";
 
     @Override
     @Nullable
@@ -47,21 +28,24 @@ public class BuildEntityManager implements BuildQuery {
 
     @Override
     public void removeBuildDependencies(@NotNull Entity build) {
-        Entity bt = build.getLink(LINK_BUILD_TO_BUILD_TYPE);
+        Entity bt = build.getLink(BuildEntity.Link.TO_BUILD_TYPE.name());
         if (bt != null)
-            bt.deleteLink(BuildTypeEntityManager.LINK_TO_BUILDS, build);
-        for (Entity dependency : build.getLinks(LINK_TO_DEPENDENCIES)) {
+            bt.deleteLink(BuildTypeEntity.Link.TO_BUILDS.name(), build);
+        for (Entity dependency : build.getLinks(BuildEntity.Link.TO_DEPENDENCY.name())) {
             dependency.delete();
         }
     }
 
     @Override
     public Collection<String> getBuildArtifactNames(@NotNull StoreTransaction txn, @NotNull BuildID buildID) {
-        Entity build = getBuildEntity(txn, buildID);
-        if (build == null) return null;
-        InputStream stream = build.getBlob(BLOB_ARTIFACT_NAMES);
-        if (stream == null) return null;
-        return CollectionConverter.fromInputStream(stream, StringBinding.BINDING);
+        Entity buildEntity = getBuildEntity(txn, buildID);
+        if (buildEntity == null) return null;
+
+        Collection<String> artifactNames = new ArrayList<>();
+        for (Entity entity : buildEntity.getLinks(BuildEntity.Link.TO_ARTIFACT.name())) {
+            artifactNames.add((String) entity.getProperty(ArtifactEntity.Property.NAME.name()));
+        }
+        return artifactNames;
     }
 
     @Override
@@ -76,27 +60,20 @@ public class BuildEntityManager implements BuildQuery {
      */
     @Override
     public void addBuildArtifact(@NotNull StoreTransaction txn, @NotNull BuildID buildID, @NotNull String artifactName, @NotNull InputStream artifact) {
-        Entity entity = getBuildEntity(txn, buildID);
-        if (entity != null)
-            entity.setBlob(artifactName, artifact);
-        /*                            final StoreTransaction txn = executor.beginTransaction();
-                            while(true) {
-                                try {
-                                    store.addBuildArtifact(txn, build.getID(), artifact.getCharKey(), stream);
-                                } catch(Throwable t) {
-                                    txn.abort();
-                                    t.printStackTrace();
-                                    break;
-                                }
-                                if (txn.flush()) {
-                                    break;
-                                }
-                            }*/
+        Entity buildEntity = getBuildEntity(txn, buildID);
+        if (buildEntity != null) {
+            Entity artifactEntity = txn.newEntity(ArtifactEntity.TYPE);
+            artifactEntity.setProperty(ArtifactEntity.Property.NAME.name(), artifactName);
+            artifactEntity.setProperty(ArtifactEntity.Property.IS_PROCESSED.name(), false);
+            artifactEntity.setBlob(ArtifactEntity.Blob.CONTENT.name(), artifact);
+
+            buildEntity.addLink(BuildEntity.Link.TO_ARTIFACT.name(), artifactEntity);
+        }
     }
 
     @Nullable
     public Entity getBuildEntity(StoreTransaction txn, BuildID buildID) {
-        EntityIterable builds = txn.find(TEST_ENTITY_TYPE, PROPERTY_BUILD_ID, buildID.getBuildID());
+        EntityIterable builds = txn.find(BuildEntity.TYPE, BuildEntity.Property.ID.name(), buildID.getBuildID());
         return builds.getFirst();
     }
 }
