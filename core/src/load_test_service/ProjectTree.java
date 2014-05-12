@@ -2,6 +2,7 @@ package load_test_service;
 
 import load_test_service.teamcity.RESTCommandImpl;
 import load_test_service.teamcity.RESTHttpClient;
+import load_test_service.teamcity.exceptions.TCException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +41,7 @@ public class ProjectTree {
         return children != null && !children.isEmpty();
     }
 
-    public  synchronized void loadChildren(RESTHttpClient client) {
+    public  synchronized void loadChildren(RESTHttpClient client) throws TCException {
         Map<String, String> subProjects = RESTCommandImpl.GET_SUB_PROJECTS.execute(client, projectID);
         if (!subProjects.isEmpty()) {
             children = new ArrayList<>(subProjects.size());

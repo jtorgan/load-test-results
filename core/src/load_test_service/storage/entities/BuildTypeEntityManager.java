@@ -9,7 +9,6 @@ import load_test_service.api.model.TestBuild;
 import load_test_service.storage.binding.BuildBinding;
 import load_test_service.storage.binding.BuildTypeBinding;
 import load_test_service.storage.binding.CollectionConverter;
-import load_test_service.storage.queries.BuildTypeQuery;
 import load_test_service.storage.schema.BuildEntity;
 import load_test_service.storage.schema.BuildTypeEntity;
 import org.jetbrains.annotations.NotNull;
@@ -21,23 +20,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class BuildTypeEntityManager implements BuildTypeQuery {
+public class BuildTypeEntityManager {
 
     public static ReentrantLock blobUpdateLock = new ReentrantLock();
 
-    @Override
     public void addBuildType(@NotNull final StoreTransaction txn, @NotNull final BuildType buildType) {
         BuildTypeBinding.createEntity(buildType, txn);
     }
 
-    @Override
     @Nullable
     public BuildType getBuildType(@NotNull StoreTransaction txn, @NotNull String btID) {
         Entity btEntity = getBuildTypeEntity(txn, btID);
         return btEntity == null ? null : BuildTypeBinding.entityToBuildType(btEntity);
     }
 
-    @Override
+//  TODO: check remove samples, all builds ( => remove all statistic values; artifacts; dependencies)
     public void removeBuildType(@NotNull StoreTransaction txn, @NotNull String btID) {
         blobUpdateLock.tryLock();
         try {
@@ -63,7 +60,6 @@ public class BuildTypeEntityManager implements BuildTypeQuery {
 
     }
 
-    @Override
     @NotNull
     public List<BuildType> getAllBuildTypes(@NotNull StoreTransaction txn) {
         final EntityIterable btEntities = txn.getAll(BuildTypeEntity.TYPE);
@@ -78,23 +74,6 @@ public class BuildTypeEntityManager implements BuildTypeQuery {
     }
 
 
-    @Override
-    public void updateMonitoringStatus(@NotNull StoreTransaction txn, @NotNull String btId, boolean status) {
-        Entity build = getBuildTypeEntity(txn, btId);
-        if (build != null) {
-            build.setProperty(BuildTypeEntity.Property.IS_MONITORED.name(), status);
-        }
-    }
-
-    @Override
-    public void updatePatterns(@NotNull StoreTransaction txn, @NotNull String btId, @NotNull List<String> patterns) {
-        Entity build = getBuildTypeEntity(txn, btId);
-        if (build != null) {
-            build.setBlob(BuildTypeEntity.Blob.PATTERNS.name(), CollectionConverter.toInputStream(StringBinding.BINDING, patterns));
-        }
-    }
-
-    @Override
     @NotNull
     public List<TestBuild> getAllBuilds(@NotNull StoreTransaction txn, @NotNull String bt) {
         Entity entity = getBuildTypeEntity(txn, bt);
@@ -115,10 +94,9 @@ public class BuildTypeEntityManager implements BuildTypeQuery {
         return entity.getLinks(BuildTypeEntity.Link.TO_BUILDS.name());
     }
 
-    @Override
-    public void addBuildEntity(@NotNull StoreTransaction txn, @NotNull TestBuild build) {
+    public Entity addBuildEntity(@NotNull StoreTransaction txn, @NotNull TestBuild build) {
         Entity bt = getBuildTypeEntity(txn, build.getID().getBuildTypeID());
-        if (bt == null) return;
+        if (bt == null) return null;
 
         bt.setBlobString(BuildTypeEntity.Blob.LAST_MONITORED_BUILD_ID.name(), build.getID().getBuildID());
 
@@ -131,6 +109,8 @@ public class BuildTypeEntityManager implements BuildTypeQuery {
 
         bt.addLink(BuildTypeEntity.Link.TO_BUILDS.name(), testEntity);
         testEntity.addLink(BuildEntity.Link.TO_BUILD_TYPE.name(), bt);
+
+        return testEntity;
     }
 
     @Nullable

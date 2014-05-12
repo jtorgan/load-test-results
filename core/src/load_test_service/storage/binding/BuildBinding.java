@@ -17,7 +17,9 @@ public class BuildBinding {
 //  to Entity
     public static Entity createEntity(@NotNull final StoreTransaction txn, @NotNull TestBuild build) {
         final Entity buildEntity = txn.newEntity(BuildEntity.TYPE);
-        buildEntity.setProperty(BuildEntity.Property.ID.name(), build.getID());
+        buildEntity.setProperty(BuildEntity.Property.BUILD_ID.name(), build.getID().getBuildID());
+        buildEntity.setProperty(BuildEntity.Property.BUILD_TYPE_ID.name(), build.getID().getBuildTypeID());
+
         buildEntity.setProperty(BuildEntity.Property.STATUS.name(), build.getStatus());
         buildEntity.setProperty(BuildEntity.Property.FINISH_DATE.name(), build.getFinishDate());
 
@@ -36,7 +38,9 @@ public class BuildBinding {
     public static Entity createDependencyEntity(@NotNull final StoreTransaction txn, @NotNull DependencyBuild build) {
         final Entity depBuild = txn.newEntity(DependencyEntity.TYPE);
 
-        depBuild.setProperty(DependencyEntity.Property.ID.name(), build.getID());
+        depBuild.setProperty(DependencyEntity.Property.BUILD_ID.name(), build.getID().getBuildID());
+        depBuild.setProperty(DependencyEntity.Property.BUILD_TYPE_ID.name(), build.getID().getBuildTypeID());
+
         depBuild.setProperty(DependencyEntity.Property.STATUS.name(), build.getStatus());
         depBuild.setProperty(DependencyEntity.Property.FINISH_DATE.name(), build.getFinishDate());
 
@@ -50,12 +54,14 @@ public class BuildBinding {
 
 //  from Entity
     public static TestBuild entityToTestBuild(@NotNull final Entity entity) {
-        BuildID id = (BuildID) entity.getProperty(BuildEntity.Property.ID.name());
+        String buildID = (String) entity.getProperty(BuildEntity.Property.BUILD_ID.name());
+        String buildTypeID = (String) entity.getProperty(BuildEntity.Property.BUILD_TYPE_ID.name());
+
         String status = (String) entity.getProperty(BuildEntity.Property.STATUS.name());
         String finish = (String) entity.getProperty(BuildEntity.Property.FINISH_DATE.name());
         String number = entity.getBlobString(BuildEntity.Blob.NUMBER.name());
 
-        TestBuild build = new TestBuild(id);
+        TestBuild build = new TestBuild(new BuildID(buildTypeID, buildID));
         build.setBuildNumber(number);
         build.setStatus(status);
         build.setFinishDate(finish);
@@ -63,7 +69,6 @@ public class BuildBinding {
         final EntityIterable entDependencies = entity.getLinks(BuildEntity.Link.TO_DEPENDENCY.name());
         if (!entDependencies.isEmpty()) {
             for(Entity entDependency : entDependencies) {
-                BuildID depID = (BuildID) entity.getProperty(DependencyEntity.Property.ID.name());
                 DependencyBuild dependency = entityToDependencyBuild(entDependency);
                 build.addDependency(dependency);
             }
@@ -76,12 +81,14 @@ public class BuildBinding {
     }
 
     public static DependencyBuild entityToDependencyBuild(@NotNull final Entity entity) {
-        BuildID id = (BuildID) entity.getProperty(DependencyEntity.Property.ID.name());
+        String buildID = (String) entity.getProperty(DependencyEntity.Property.BUILD_ID.name());
+        String buildTypeID = (String) entity.getProperty(DependencyEntity.Property.BUILD_TYPE_ID.name());
+
         String status = (String) entity.getProperty(DependencyEntity.Property.STATUS.name());
         String finish = (String) entity.getProperty(DependencyEntity.Property.FINISH_DATE.name());
         String number = entity.getBlobString(DependencyEntity.Blob.NUMBER.name());
 
-        DependencyBuild build = new DependencyBuild(id);
+        DependencyBuild build = new DependencyBuild(new BuildID(buildTypeID, buildID));
         build.setBuildNumber(number);
         build.setStatus(status);
         build.setFinishDate(finish);

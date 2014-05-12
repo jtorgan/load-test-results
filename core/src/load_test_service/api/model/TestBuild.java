@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,5 +36,21 @@ public class TestBuild extends BaseBuildInfo {
             dependencyList = new ArrayList<>();
         }
         dependencyList.add(dependency);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder(super.toString());
+        result.append("\nTest build:\n");
+        if (artifacts != null && !artifacts.isEmpty())
+            result.append("artifacts: ").append(Arrays.toString(artifacts.toArray()));
+        if (dependencyList != null && !dependencyList.isEmpty()) {
+            result.append("dependencyCount: ").append(dependencyList.size());
+            result.append("dependencyNames: [");
+            for (DependencyBuild dep : dependencyList)
+                result.append(dep.getName()).append(", ");
+            result.append("]");
+        }
+        return result.toString();
     }
 }

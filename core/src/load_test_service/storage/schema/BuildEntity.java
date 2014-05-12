@@ -9,7 +9,7 @@ public final class BuildEntity {
     public static final String TYPE = "testBuild";
 
     public static enum Property {
-        ID, STATUS, FINISH_DATE
+        BUILD_ID, BUILD_TYPE_ID, STATUS, FINISH_DATE
     }
 
     public static enum Blob {

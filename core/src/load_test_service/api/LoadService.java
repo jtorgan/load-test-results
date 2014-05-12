@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -42,14 +43,14 @@ public interface LoadService {
 
     /**
      * Get build configuration by buildTypeID
-     * @param btID = TC buildType ID
+     * @param btID = TC buildType BUILD_ID
      */
     @Nullable
     BuildType getBuildType(@NotNull final String btID);
 
     /**
      * Remove build configuration from entity store, including all builds, downloaded artifacts, calculated statistic values
-     * @param btID = TC buildType ID
+     * @param btID = TC buildType BUILD_ID
      */
     void removeBuildType(@NotNull final String btID);
 
@@ -148,13 +149,10 @@ public interface LoadService {
     boolean isStatisticCalculated(@NotNull final BuildID buildID, @NotNull final String artifactName);
 
     @NotNull
-    Map<String, Boolean> getStatMarkedArtifacts(@NotNull final BuildID buildID);
+    Collection<String> getArtifactsWithStat(@NotNull final BuildID buildID);
 
     @NotNull
-    List<String> getArtifactsWithStat(@NotNull final BuildID buildID);
-
-    @NotNull
-    List<String> getArtifactsWithoutStat(@NotNull final BuildID buildID);
+    Collection<String> getArtifactsWithoutStat(@NotNull final BuildID buildID);
 
 //    @Nullable
 //    List<TestID> getAllTests(@NotNull final BuildID buildID);

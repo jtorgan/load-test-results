@@ -30,4 +30,9 @@ public class Change implements Comparable<Change> {
         if (this == o) return 0;
         return revision.compareTo(o.getRevision());
     }
+
+    @Override
+    public String toString() {
+        return "author = " + author + "; revision = " + revision;
+    }
 }

@@ -48,4 +48,9 @@ public class BuildID implements Comparable<BuildID>{
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "buildId = " + buildID + ";" + "buildTypeID = " + buildTypeID;
+    }
 }

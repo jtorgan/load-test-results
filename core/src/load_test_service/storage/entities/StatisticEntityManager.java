@@ -12,11 +12,7 @@ import load_test_service.api.statistic.TestID;
 import load_test_service.api.statistic.metrics.MetricCounter;
 import load_test_service.statistic.readers.RawDataReader;
 import load_test_service.statistic.readers.StatisticAggregatedReader;
-import load_test_service.storage.queries.StatisticQuery;
-import load_test_service.storage.schema.BuildEntity;
-import load_test_service.storage.schema.BuildTypeEntity;
-import load_test_service.storage.schema.SampleEntity;
-import load_test_service.storage.schema.SampleValue;
+import load_test_service.storage.schema.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
@@ -24,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StatisticEntityManager implements StatisticQuery {
+public class StatisticEntityManager {
 
     /**
      * Calculate statistic and save it to store
@@ -34,13 +30,13 @@ public class StatisticEntityManager implements StatisticQuery {
      * @throws FileFormatException
      */
 //  todo: is need to add link build => sample value
-    public void countStatistic(@NotNull StoreTransaction txn, @NotNull final Entity build,
-                               @NotNull final InputStream artifact, @NotNull final StatisticProperties properties) throws FileFormatException, LinkNotFound {
+    public void countStatistic(@NotNull StoreTransaction txn, @NotNull final Entity build, @NotNull final Entity artifact,
+                               @NotNull final StatisticProperties properties) throws FileFormatException, LinkNotFound {
         Entity buildType = build.getLink(BuildEntity.Link.TO_BUILD_TYPE.name());
         if (buildType == null)
             throw new LinkNotFound(BuildEntity.Link.TO_BUILD_TYPE.name(), build);
         StatisticAggregatedReader reader = new StatisticAggregatedReader(properties);
-        reader.processFile(artifact);
+        reader.processFile(artifact.getBlob(ArtifactEntity.Blob.CONTENT.name()));
 
 //        create existed samples map
         Map<String, Entity> existedSamples = new HashMap<>();
@@ -49,13 +45,13 @@ public class StatisticEntityManager implements StatisticQuery {
             existedSamples.put(key, sample);
         }
 
-        saveTestValues(txn, buildType, build, existedSamples, reader.getValuesBySamplers());
+        saveTestValues(txn, buildType, build, artifact, existedSamples, reader.getValuesBySamplers());
         if (properties.isCalculateTotal()) {
-            saveTestValues(txn, buildType, build, existedSamples, reader.getTotalValuesByThreadGroups());
+            saveTestValues(txn, buildType, build, artifact, existedSamples, reader.getTotalValuesByThreadGroups());
         }
     }
 
-    private void saveTestValues(StoreTransaction txn, Entity buildType, Entity build, Map<String, Entity> existedSamples, Map<TestID, List<MetricCounter>> tests) {
+    private void saveTestValues(StoreTransaction txn, Entity buildType, Entity build, Entity artifact, Map<String, Entity> existedSamples, Map<TestID, List<MetricCounter>> tests) {
         for(TestID testID : tests.keySet()) {
             String key = testID.getThreadGroup() + testID.getTestName();
             Entity sample = existedSamples.get(key);
@@ -76,6 +72,7 @@ public class StatisticEntityManager implements StatisticQuery {
 
                     sample.addLink(SampleEntity.Link.TO_SAMPLE_VALUE.name(), value);
                     build.addLink(BuildEntity.Link.TO_SAMPLE_VALUE.name(), value);
+                    artifact.addLink(ArtifactEntity.Link.TO_STAT_SAMPLES_VALUES.name(), value);
 
                 } else if (metric instanceof MetricCounter.MultipleValueMetric) { // Response codes - with several values
                     MetricCounter.MultipleValueMetric multipleValueMetric = (MetricCounter.MultipleValueMetric) metric;
@@ -87,6 +84,7 @@ public class StatisticEntityManager implements StatisticQuery {
 
                         sample.addLink(SampleEntity.Link.TO_SAMPLE_VALUE.name(), value);
                         build.addLink(BuildEntity.Link.TO_SAMPLE_VALUE.name(), value);
+                        artifact.addLink(ArtifactEntity.Link.TO_STAT_SAMPLES_VALUES.name(), value);
                     }
                 }
             }
@@ -103,12 +101,6 @@ public class StatisticEntityManager implements StatisticQuery {
         sampleValue.setBlobString(SampleValue.Blob.VALUE.name(), String.valueOf(value));
         return sampleValue;
     }
-
-
-
-
-
-
 
     public void deleteBuildStatistic(@NotNull final Entity build) {
         EntityIterable values = build.getLinks(BuildEntity.Link.TO_SAMPLE_VALUE.name());

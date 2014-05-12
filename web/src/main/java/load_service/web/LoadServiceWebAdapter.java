@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -132,19 +133,13 @@ public class LoadServiceWebAdapter implements LoadService {
 
     @NotNull
     @Override
-    public Map<String, Boolean> getStatMarkedArtifacts(@NotNull BuildID buildID) {
-        return myService.getStatMarkedArtifacts(buildID);
-    }
-
-    @NotNull
-    @Override
-    public List<String> getArtifactsWithStat(@NotNull BuildID buildID) {
+    public Collection<String> getArtifactsWithStat(@NotNull BuildID buildID) {
         return myService.getArtifactsWithStat(buildID);
     }
 
     @NotNull
     @Override
-    public List<String> getArtifactsWithoutStat(@NotNull BuildID buildID) {
+    public Collection<String> getArtifactsWithoutStat(@NotNull BuildID buildID) {
         return myService.getArtifactsWithoutStat(buildID);
     }
 }

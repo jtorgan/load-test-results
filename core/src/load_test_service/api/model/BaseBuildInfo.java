@@ -43,7 +43,7 @@ public abstract class BaseBuildInfo implements Comparable<BaseBuildInfo> {
             return USER_Date_Format.format(result);
         } catch (ParseException e) {
             e.printStackTrace();
-            return null;
+            return "NULL: parse exception";
         }
     }
 
@@ -64,7 +64,7 @@ public abstract class BaseBuildInfo implements Comparable<BaseBuildInfo> {
 
     @Override
     public String toString() {
-        return "BaseBuildInfo: [" + id + "; bn = " + buildNumber + "; status = " + status + "]\n";
+        return "BaseBuildInfo: [" + id + "; bn = " + buildNumber + "; status = " + status + "; finishDate = " + finishDate + "]\n";
     }
 
 }

@@ -5,6 +5,7 @@ import load_test_service.api.model.BuildType;
 import load_test_service.api.model.TestBuild;
 import load_test_service.teamcity.RESTCommandImpl;
 import load_test_service.teamcity.RESTHttpClient;
+import load_test_service.teamcity.exceptions.TCException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -31,8 +32,12 @@ public class BuildTypeController {
     public String get(@RequestParam(value = "projectID", required = true) String projectID, ModelMap modelMap) {
         RESTHttpClient client = RESTHttpClient.newDefaultInstance();
         modelMap.addAttribute("projectID", projectID);
-        modelMap.addAttribute("projectName", RESTCommandImpl.GET_PROJECT_NAME.execute(client, projectID));
-        modelMap.addAttribute("bts", RESTCommandImpl.GET_BUILD_TYPES.execute(client, projectID));
+        try {
+            modelMap.addAttribute("projectName", RESTCommandImpl.GET_PROJECT_NAME.execute(client, projectID));
+            modelMap.addAttribute("bts", RESTCommandImpl.GET_BUILD_TYPES.execute(client, projectID));
+        } catch (TCException e) {
+            e.printStackTrace(); // todo: show in UI
+        }
         return "buildTypes";
     }
 

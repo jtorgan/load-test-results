@@ -3,6 +3,7 @@ package load_test_service.api.model;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class DependencyBuild extends BaseBuildInfo {
@@ -31,5 +32,15 @@ public class DependencyBuild extends BaseBuildInfo {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder(super.toString());
+        result.append("\nDependency build:\n");
+        result.append("name: ").append(name);
+        if (changes != null && !changes.isEmpty())
+            result.append("changes: ").append(Arrays.toString(changes.toArray()));
+        return result.toString();
     }
 }
