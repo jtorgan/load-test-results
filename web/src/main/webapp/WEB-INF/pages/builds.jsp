@@ -18,7 +18,7 @@
 <head>
     <title>Builds in ${buildTypeID}</title>
 
-    <script src="http://code.jquery.com/jquery-2.0.2.js"></script>
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="/resources/js/builds.js" language="JavaScript"></script>
 
     <link rel="stylesheet" href="/resources/css/common.css">
@@ -44,16 +44,7 @@
                     <tr id="${build.ID.buildID}" class="build">
                         <td class="clickable">${build.ID.buildID}</td>
                         <td class="clickable">${build.buildNumber}</td>
-                        <td class="clickable">
-                            <c:choose>
-                                <c:when test="${build.status == 'SUCCESS'}">
-                                    <span style="color: darkgreen">
-                                </c:when>
-                                <c:otherwise>
-                                    <span style="color: darkred">
-                                </c:otherwise>
-                            </c:choose>
-                        ${build.status}</span></td>
+                        <td class="clickable"><template:buildStatus status="${build.status}"/></td>
                         <td class="clickable">${build.finishFormattedDate}</td>
                         <td><div class="remove" onclick="removeBuild(${i}, this, '${build.ID.buildID}', '${build.ID.buildTypeID}')"></div></td>
                     </tr>

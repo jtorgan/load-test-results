@@ -66,7 +66,7 @@ public class StatisticEntityManager {
             for (MetricCounter metric : tests.get(testID)) {
                 if (metric instanceof MetricCounter.SingleValueMetric) { // Min, Max, Average, 90Line - with one value
                     MetricCounter.SingleValueMetric singleMetric = (MetricCounter.SingleValueMetric) metric;
-                    Entity value = createValueEntity(txn, metric.getKey(), singleMetric.getBuildValue(), false, null);
+                    Entity value = createValueEntity(txn, build, metric.getKey(), singleMetric.getBuildValue(), false, null);
 
                     value.addLink(SampleValue.Link.TO_SAMPLE.name(), sample);
 
@@ -78,7 +78,7 @@ public class StatisticEntityManager {
                     MetricCounter.MultipleValueMetric multipleValueMetric = (MetricCounter.MultipleValueMetric) metric;
                     Map<String, Long> subValues = multipleValueMetric.getBuildValues();
                     for (String subKey : subValues.keySet()) {
-                        Entity value = createValueEntity(txn, metric.getKey(), subValues.get(subKey), true, subKey);
+                        Entity value = createValueEntity(txn, build, metric.getKey(), subValues.get(subKey), true, subKey);
 
                         value.addLink(SampleValue.Link.TO_SAMPLE.name(), sample);
 
@@ -91,10 +91,10 @@ public class StatisticEntityManager {
         }
     }
 
-    private Entity createValueEntity(StoreTransaction txn, String metric, long value, boolean hasSubMetric, String subMetric) {
+    private Entity createValueEntity(StoreTransaction txn, Entity build, String metric, long value, boolean hasSubMetric, String subMetric) {
         Entity sampleValue = txn.newEntity(SampleValue.TYPE);
         sampleValue.setProperty(SampleValue.Property.METRIC.name(), metric);
-
+        sampleValue.setProperty(SampleValue.Property.BUILD_ID.name(), build.getProperty(BuildEntity.Property.BUILD_ID.name()));
         if (hasSubMetric)
             sampleValue.setProperty(SampleValue.Property.SUB_METRIC.name(), subMetric);
 

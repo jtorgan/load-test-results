@@ -9,6 +9,7 @@ import load_test_service.api.statistic.StatisticProperties;
 import load_test_service.api.statistic.TestBuildStatistic;
 import load_test_service.api.statistic.TestID;
 import load_test_service.api.statistic.metrics.Metric;
+import load_test_service.api.statistic.results.Sample;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -153,6 +154,9 @@ public interface LoadService {
 
     @NotNull
     Collection<String> getArtifactsWithoutStat(@NotNull final BuildID buildID);
+
+    @NotNull
+    Collection<Sample> getStatistic(@NotNull final String buildTypeID);
 
 //    @Nullable
 //    List<TestID> getAllTests(@NotNull final BuildID buildID);

@@ -11,6 +11,7 @@ import load_test_service.api.statistic.StatisticProperties;
 import load_test_service.api.statistic.TestBuildStatistic;
 import load_test_service.api.statistic.TestID;
 import load_test_service.api.statistic.metrics.Metric;
+import load_test_service.api.statistic.results.Sample;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -141,5 +142,11 @@ public class LoadServiceWebAdapter implements LoadService {
     @Override
     public Collection<String> getArtifactsWithoutStat(@NotNull BuildID buildID) {
         return myService.getArtifactsWithoutStat(buildID);
+    }
+
+    @NotNull
+    @Override
+    public Collection<Sample> getStatistic(@NotNull String buildTypeID) {
+        return myService.getStatistic(buildTypeID);
     }
 }

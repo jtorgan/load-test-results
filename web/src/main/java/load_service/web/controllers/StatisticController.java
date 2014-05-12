@@ -33,7 +33,9 @@ public class StatisticController {
 
 
     @RequestMapping(value = "/statForm", method = RequestMethod.GET)
-    public String getStatForm(@RequestParam(value = "buildTypeID", required = true) String buildTypeID, @RequestParam(value = "buildID", required = true) String buildID, ModelMap model) {
+    public String getStatForm(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
+                              @RequestParam(value = "buildID", required = true) String buildID,
+                              ModelMap model) {
         BuildID id = new BuildID(buildTypeID, buildID);
         TestBuild build = service.getBuild(id);
         if (build != null) {
@@ -46,7 +48,9 @@ public class StatisticController {
 
 
     @RequestMapping(value = "/artWithStat", method = RequestMethod.GET)
-    public String getArtifactsWithStat(@RequestParam(value = "buildTypeID", required = true) String buildTypeID, @RequestParam(value = "buildID", required = true) String buildID, ModelMap model) {
+    public String getArtifactsWithStat(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
+                                       @RequestParam(value = "buildID", required = true) String buildID,
+                                       ModelMap model) {
         BuildID id = new BuildID(buildTypeID, buildID);
         TestBuild build = service.getBuild(id);
         if (build != null) {
@@ -85,11 +89,14 @@ public class StatisticController {
     }
 
     @RequestMapping(value = "/showStat", method = RequestMethod.GET)
-    public String showStat(@RequestParam(value = "buildTypeID", required = true) String buildTypeID, @RequestParam(value = "buildID", required = true) String buildID,
-                           @RequestParam(value = "artifact", required = true) String artifact,
+    public String showStat(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
+                           @RequestParam(value = "buildID", required = true) String buildID,
+                           @RequestParam(value = "path", required = true) String path,
                            ModelMap model) {
 		//todo: show page with statistic
         BuildID id = new BuildID(buildTypeID, buildID);
+        model.put("build", service.getBuild(id));
+        model.put("samples", service.getStatistic(buildTypeID));
         return "statistic";
     }
 }

@@ -11,7 +11,7 @@
 <head>
     <title>Performance results</title>
 
-    <script src="http://code.jquery.com/jquery-2.0.2.js"></script>
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="/resources/js/projects.js" language="JavaScript"></script>
 
     <link href="/resources/css/projects.css" rel="stylesheet">

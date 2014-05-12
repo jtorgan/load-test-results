@@ -17,7 +17,13 @@
                 <input type="hidden" name="path" value="${art}" >
 
                 <span class="art" style="margin-right: 10px" onclick="$('#${index}ready').submit();">${art}</span>
-                <button onclick="">show statistic</button>
+            </form>
+
+            <form action="/statistic/showStat" method="get">
+                <input type="hidden" name="buildID" value="${build.ID.buildID}">
+                <input type="hidden" name="buildTypeID" value="${build.ID.buildTypeID}">
+                <input type="hidden" name="path" value="${art}" >
+                <input type="submit" value="show statistic" name="Statistic">
             </form>
         </div>
         <c:set var="index" value="${index+1}"/>
