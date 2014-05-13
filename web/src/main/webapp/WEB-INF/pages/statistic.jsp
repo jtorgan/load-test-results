@@ -15,37 +15,44 @@
 <head>
     <title>Performance statistic</title>
 
-    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
-
-    <%--<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>--%>
-    <%--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js"></script>--%>
-<%----%>
-    <%--<script src="https://raw.githubusercontent.com/novus/nvd3/master/nv.d3.min.js"></script>--%>
-    <%--<link rel="stylesheet" href="https://raw.githubusercontent.com/novus/nvd3/master/src/nv.d3.css">--%>
-
-    <%--<script src="/resources/js/builds.js" language="JavaScript"></script>--%>
-
-<%--    <link rel="stylesheet" href="/resources/css/common.css">
-    <link rel="stylesheet" href="/resources/css/builds.css">--%>
+    <script type="text/javascript" src="/resources/nvd3/d3.v3.js"></script>
+    <script type="text/javascript" src="/resources/nvd3/nv.d3.js"></script>
+    <link href="/resources/nvd3/nv.d3.css" rel="stylesheet" type="text/css">
 
     <style>
         #common {
             width: 95%;
+            border: 1px solid #d0d0d0;
+        }
+        #common th {
+            background-color: #e5e5e5;
         }
         #buildInfo {
-            width: 30%;
+            width: 35%;
         }
         #dependencies {
-            width: 70%;
+            width: 65%;
+        }
+        .sample_title {
+            padding: 5px 0;
+        }
+        .chart svg {
+            /*width: 800px;*/
+            height: 280px;
+        }
+        .nv-axisMaxMin text {
+            font-weight: normal !important;
         }
     </style>
 </head>
 <body>
 <table id="common">
+    <thead>
     <tr>
         <th>Build info</th>
         <th>Dependencies</th>
     </tr>
+    </thead>
    <tr>
        <td id="buildInfo">
            <table>
@@ -73,25 +80,79 @@
    </tr>
 </table>
 
+<br/>
 
-<table>
+<%--<table>--%>
+    <c:set var="id" value="1"/>
     <c:forEach var="sample" items="${samples}">
-        <tr><td>${sample.threadGroup}</td><td>${sample.name}</td></tr>
-        <c:forEach var="metric" items="${sample.metricValues}">
-            <tr>
-                <td></td>
-                <td>${metric.key}</td>
-            </tr>
 
-            <c:forEach var="value" items="${metric.value}">
-            <tr>
-                <td>${value.buildID}</td>
-                <td>${value.value}</td>
-            </tr>
-            </c:forEach>
-        </c:forEach>
+        <div class="sample_charts">
+            <div class="sample_title">
+                <strong> ${sample.threadGroup} - ${sample.name} </strong>
+            </div>
+
+            <div id="sample${id}" class="chart">
+                <svg></svg>
+            </div>
+
+            <script type="text/javascript">
+                (function() {
+                    var data = [
+                        <c:forEach items="${sample.metricValues}" var="metric" varStatus="loopOuter">
+                        {
+                            key: "${metric.key}",
+                            values: [
+                            <c:forEach items="${metric.value}" var="value" varStatus="loopInner">
+                                { x: "${value.buildID}" , y: ${value.value} }
+                                ${not loopInner.last ? "," : ""}
+                            </c:forEach>
+                            ]
+                        }
+                        ${not loopOuter.last ? "," : ""}
+                        </c:forEach>
+                    ];
+                    nv.addGraph(function() {
+                        var width = 800,
+                            height = 320,
+                            margin = {top: 30, right: 50, bottom: 50, left: 80};
+
+                        var builds = data[0].values.map(function(d) {return d.x;});
+
+                        var chart = nv.models.lineChart()
+                                        .width(width - margin.right - margin.left)
+                                        .height(height - margin.top - margin.bottom)
+                                        .margin(margin)
+                                        .x(function(d, id) { return id })
+                                        .color(d3.scale.category10().range())
+                                        .useInteractiveGuideline(true)
+                         ;
+                        chart.xAxis
+                                .axisLabel('Build ID')
+                                .tickFormat(function(id) {
+                                    return builds[id];
+                                })
+                        ;
+
+                        chart.yAxis
+                                .axisLabel('Time (ms)')
+                                .axisLabelDistance(40);
+
+                        chart.forceY([0]);
+                        d3.select('#sample${id} svg')
+                                .datum(data)
+                                .call(chart)
+                        ;
+                        nv.utils.windowResize(chart.update);
+                        return chart;
+                    });
+
+                })();
+            </script>
+
+        </div>
+        <c:set var="id" value="${id+1}"/>
     </c:forEach>
-</table>
+<%--</table>--%>
 
 </body>
 </html>

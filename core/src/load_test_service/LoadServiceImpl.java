@@ -389,14 +389,14 @@ public class LoadServiceImpl implements LoadService, TCAnalyzerInnerQuery {
 
                     EntityIterable values = entSample.getLinks(SampleEntity.Link.TO_SAMPLE_VALUE.name());
                     for (Entity entValue : values) {
-                        long buildId = (long) entValue.getProperty(SampleValue.Property.BUILD_ID.name());
+                        String buildId = (String) entValue.getProperty(SampleValue.Property.BUILD_ID.name());
                         String metric = (String) entValue.getProperty(SampleValue.Property.METRIC.name());
                         String subMetric = (String) entValue.getProperty(SampleValue.Property.SUB_METRIC.name());
                         long value = Long.valueOf(entValue.getBlobString(SampleValue.Blob.VALUE.name()));
 
                         if (subMetric != null && !subMetric.isEmpty())
                             metric += " ( " + subMetric + " )";
-                        sample.addMetricValue(metric, buildId, value);
+                        sample.addMetricValue(metric, Long.valueOf(buildId), value);
                     }
                 }
                 return results.values();
