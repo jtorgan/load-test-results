@@ -88,7 +88,12 @@
 
         <div class="sample_charts">
             <div class="sample_title">
-                <strong> ${sample.threadGroup} - ${sample.name} </strong>
+                <strong>
+                    <c:if test="${not empty sample.threadGroup}">
+                        ${sample.threadGroup} -
+                    </c:if>
+                  ${sample.name}
+                </strong>
             </div>
 
             <div id="sample${id}" class="chart">
