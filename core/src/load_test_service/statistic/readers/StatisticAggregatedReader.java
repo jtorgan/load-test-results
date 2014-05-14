@@ -7,11 +7,13 @@ import load_test_service.api.statistic.TestID;
 import load_test_service.api.statistic.metrics.Metric;
 import load_test_service.api.statistic.metrics.MetricCounter;
 import load_test_service.statistic.BaseMetrics;
-import load_test_service.statistic.TestIDImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
+/**
+ * Reader to calculate aggregated statistic values
+ */
 public class StatisticAggregatedReader extends FileReader {
     private final StatisticProperties properties;
     private Metric[] metrics;
@@ -40,11 +42,11 @@ public class StatisticAggregatedReader extends FileReader {
     protected void processLine(String line) throws FileFormatException {
         Item item = new Item(line, properties);
 
-        TestID testID = new TestIDImpl(item.getThreadGroup(), item.getTestName());
+        TestID testID = new TestID(item.getThreadGroup(), item.getTestName());
         runCounters(testID, item, samplers);
 
         if (properties.isCalculateTotal()) {
-            testID = new TestIDImpl(item.getThreadGroup(), BaseMetrics.TOTAL_NAME);
+            testID = new TestID(item.getThreadGroup(), BaseMetrics.TOTAL_NAME);
             runCounters(testID, item, totals);
         }
 
@@ -56,6 +58,8 @@ public class StatisticAggregatedReader extends FileReader {
         }
     }
 
+
+
     public Collection<TestID> getAllTestIDs() {
         return samplers.keySet();
     }
@@ -63,6 +67,7 @@ public class StatisticAggregatedReader extends FileReader {
     public Collection<MetricCounter> getSamplerValues(@NotNull TestID testID) {
         return samplers.get(testID);
     }
+
 
     public Map<TestID, List<MetricCounter>> getValuesBySamplers() {
         return samplers;

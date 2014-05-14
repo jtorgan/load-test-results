@@ -11,7 +11,7 @@ $(function() {
         var buildTypeID = $("#btID").val();
         loadBuildInfo(buildID, buildTypeID);
         loadStatForm(buildID, buildTypeID);
-        loadArtifacts(buildID, buildTypeID);
+//        loadArtifacts(buildID, buildTypeID);
     });
 });
 
@@ -37,7 +37,7 @@ function loadStatForm(buildID, buildTypeID) {
     });
 }
 
-function loadArtifacts(buildID, buildTypeID) {
+/*function loadArtifacts(buildID, buildTypeID) {
     $.ajax({
         type: "get",
         url: "/statistic/artWithStat",
@@ -46,7 +46,7 @@ function loadArtifacts(buildID, buildTypeID) {
         $("#artWithStat").html(data);
         currentBuild = buildID;
     });
-}
+}*/
 
 
 function removeBuild(index, div, bID, btID) {
@@ -96,11 +96,17 @@ function calculateStatistic(bID, btID) {
         },
         dataType: "json",
         success: function(){
-            loadArtifacts(bID, btID);
+//            loadArtifacts(bID, btID);
             loadStatForm(bID, btID);
+            var statCell = $("#" + bID + " .statistic");
+            statCell.html('<form action="/statistic/showStat" method="get" target="_blank"> <input type="hidden" name="buildID" value="' + bID +
+                '"> <input type="hidden" name="buildTypeID" value="' + btID + '"> <input type="hidden" name="path" value="' + artifact +
+                '"> <a href="javascript:;" onclick="parentNode.submit();" title="Click to show calculated statistic">' + artifact +
+                '</a> </form>');
+
         },
         error: function(){
-            alert('failure');
+            alert('Error happened during calculate load statistic');
         }
     });
 }

@@ -16,10 +16,11 @@
     width: 18px;
     cursor: pointer;
     height: 18px;
+    margin: 0 5px;
 }
 
 .frame-block{
-    width: 95%;
+    width: 100%;
     height: 33%;
     max-height: 33%;
     display: block;
@@ -31,6 +32,6 @@
     float: left;
     width: 98%;
     padding: 1%;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 95%;
 }

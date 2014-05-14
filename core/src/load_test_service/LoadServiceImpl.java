@@ -9,16 +9,18 @@ import load_test_service.api.model.BuildID;
 import load_test_service.api.model.BuildType;
 import load_test_service.api.model.TestBuild;
 import load_test_service.api.statistic.StatisticProperties;
-import load_test_service.api.statistic.TestBuildStatistic;
 import load_test_service.api.statistic.TestID;
 import load_test_service.api.statistic.metrics.Metric;
-import load_test_service.api.statistic.results.Sample;
+import load_test_service.api.statistic.results.SampleRawResults;
+import load_test_service.api.statistic.results.SampleStatistic;
 import load_test_service.statistic.BaseMetrics;
 import load_test_service.storage.binding.CollectionConverter;
 import load_test_service.storage.entities.BuildEntityManager;
 import load_test_service.storage.entities.BuildTypeEntityManager;
 import load_test_service.storage.entities.StatisticEntityManager;
-import load_test_service.storage.schema.*;
+import load_test_service.storage.schema.ArtifactEntity;
+import load_test_service.storage.schema.BuildEntity;
+import load_test_service.storage.schema.BuildTypeEntity;
 import load_test_service.teamcity.RESTHttpClient;
 import load_test_service.teamcity.TCAnalyzer;
 import load_test_service.teamcity.TCAnalyzerInnerQuery;
@@ -27,7 +29,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -313,12 +318,6 @@ public class LoadServiceImpl implements LoadService, TCAnalyzerInnerQuery {
         });
     }
 
-    @Override
-    public Map<TestID, TestBuildStatistic> getRawStatistic(@NotNull BuildID buildID, @NotNull String artifactName) throws FileFormatException {
-        InputStream artifact = getArtifact(buildID, artifactName);
-        return statistic.getRawStatistic(artifact);
-    }
-
 
     @Override
     public boolean isStatisticCalculated(@NotNull final BuildID buildID, @NotNull final String artifactName) {
@@ -354,52 +353,64 @@ public class LoadServiceImpl implements LoadService, TCAnalyzerInnerQuery {
     }
 
 
-    private InputStream getArtifact(final BuildID buildID, final String artifactName) {
-        return store.computeInReadonlyTransaction(new StoreTransactionalComputable<InputStream>() {
+    @NotNull
+    @Override
+    public Map<TestID, SampleStatistic> getStatistic(@NotNull final String buildTypeID) {
+        return store.computeInReadonlyTransaction(new StoreTransactionalComputable<Map<TestID, SampleStatistic>>() {
             @Override
-            public InputStream compute(@NotNull StoreTransaction txn) {
-                return buildManager.loadArtifact(txn, buildID, artifactName);
+            public Map<TestID, SampleStatistic> compute(@NotNull StoreTransaction txn) {
+                Entity buildType = buildTypeManager.getBuildTypeEntity(txn, buildTypeID);
+                if (buildType == null) return Collections.emptyMap();
+                return statistic.getStatistic(buildType);
             }
         });
     }
 
+    @Nullable
+    @Override
+    public SampleStatistic getSampleStatistic(@NotNull final String buildTypeID, @NotNull final TestID testID) {
+        return store.computeInReadonlyTransaction(new StoreTransactionalComputable<SampleStatistic>() {
+            @Override
+            public SampleStatistic compute(@NotNull StoreTransaction txn) {
+                Entity buildType = buildTypeManager.getBuildTypeEntity(txn, buildTypeID);
+                if (buildType == null) return null;
+                return statistic.getSampleStatistic(buildType, testID);
+            }
+        });
+    }
+
+
+
     @NotNull
     @Override
-    public Collection<Sample> getStatistic(@NotNull final String buildTypeID) {
-        return store.computeInReadonlyTransaction(new StoreTransactionalComputable<Collection<Sample>>() {
+    public Map<TestID, SampleRawResults> getRawStatistic(@NotNull final BuildID buildID, @NotNull final String artifactName) {
+        return store.computeInReadonlyTransaction(new StoreTransactionalComputable<Map<TestID, SampleRawResults>>() {
             @Override
-            public Collection<Sample> compute(@NotNull StoreTransaction txn) {
-                Entity buildType = buildTypeManager.getBuildTypeEntity(txn, buildTypeID);
-                if (buildType == null) return Collections.emptyList();
-
-                EntityIterable entSamples = buildType.getLinks(BuildTypeEntity.Link.TO_SAMPLES.name());
-                EntityIterable entBuilds = buildType.getLinks(BuildTypeEntity.Link.TO_BUILDS.name());
-                if (entSamples.isEmpty() || entBuilds.isEmpty()) return Collections.emptyList();
-
-                Map<String, Sample> results = new HashMap<>();
-                for (Entity entSample : entSamples) {
-                    String name = (String) entSample.getProperty(SampleEntity.Property.SAMPLE_NAME.name());
-                    String threadGroup = (String) entSample.getProperty(SampleEntity.Property.THREAD_GROUP.name());
-
-                    Sample sample = results.get(threadGroup + name);
-                    if (sample == null) {
-                        sample = new Sample(threadGroup, name);
-                        results.put(threadGroup + name, sample);
-                    }
-
-                    EntityIterable values = entSample.getLinks(SampleEntity.Link.TO_SAMPLE_VALUE.name());
-                    for (Entity entValue : values) {
-                        String buildId = (String) entValue.getProperty(SampleValue.Property.BUILD_ID.name());
-                        String metric = (String) entValue.getProperty(SampleValue.Property.METRIC.name());
-                        String subMetric = (String) entValue.getProperty(SampleValue.Property.SUB_METRIC.name());
-                        long value = Long.valueOf(entValue.getBlobString(SampleValue.Blob.VALUE.name()));
-
-                        if (subMetric != null && !subMetric.isEmpty())
-                            metric += " ( " + subMetric + " )";
-                        sample.addMetricValue(metric, Long.valueOf(buildId), value);
-                    }
+            public Map<TestID, SampleRawResults> compute(@NotNull StoreTransaction txn) {
+                Entity artifact  = buildManager.getArtifact(txn, buildID, artifactName);
+                if (artifact != null)  {
+                    try {
+                        return statistic.getRawStatistic(buildID, artifactName, artifact);
+                    } catch (FileFormatException ignore) { }
                 }
-                return results.values();
+                return Collections.emptyMap();
+            }
+        });
+    }
+
+    @Nullable
+    @Override
+    public SampleRawResults getSampleRawStatistic(@NotNull final BuildID buildID, @NotNull final String artifactName, @NotNull final TestID testID) {
+        return store.computeInReadonlyTransaction(new StoreTransactionalComputable<SampleRawResults>() {
+            @Override
+            public SampleRawResults compute(@NotNull StoreTransaction txn) {
+                Entity artifact  = buildManager.getArtifact(txn, buildID, artifactName);
+                if (artifact != null)  {
+                    try {
+                        return statistic.getSampleRawStatistic(buildID, artifactName, artifact, testID);
+                    } catch (FileFormatException ignore) { }
+                }
+                return null;
             }
         });
     }

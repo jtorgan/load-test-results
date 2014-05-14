@@ -16,9 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-/**
- * Created by Yuliya.Torhan on 5/5/14.
- */
 @Controller
 @RequestMapping("/builds")
 public class BuildController {

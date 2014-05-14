@@ -1,17 +1,21 @@
 .bt-container {
     padding: 5px 20px 5px 20px;
-    width: 90%;
+    width: 95%;
     max-height: 90%;
     height: 90%;
-    overflow-y: scroll;
-    overflow-wrap: hyphenate;
+    overflow-y: auto;
     float: left;
 }
-#back {
+
+.header {
     width: 100%;
     padding: 0 10px;
-    /*border-top: 1px solid #86a4c3;*/
     margin: 10px;
+}
+
+#back {
+
+    /*border-top: 1px solid #86a4c3;*/
     float: left;
 }
 
@@ -33,3 +37,15 @@
 .art:hover, .build:hover {
     color: #86a4c3 !important;
 }
+
+.artifacts {
+    height: 60px;
+    max-height: 60px;
+    overflow-y: auto;
+    margin: 0 10px;
+}
+
+.statistic {
+    padding: 0 10px !important;
+}
+

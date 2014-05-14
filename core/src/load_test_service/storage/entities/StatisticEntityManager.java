@@ -7,20 +7,23 @@ import load_test_service.api.exeptions.FileFormatException;
 import load_test_service.api.exeptions.LinkNotFound;
 import load_test_service.api.model.BuildID;
 import load_test_service.api.statistic.StatisticProperties;
-import load_test_service.api.statistic.TestBuildStatistic;
 import load_test_service.api.statistic.TestID;
 import load_test_service.api.statistic.metrics.MetricCounter;
+import load_test_service.api.statistic.results.SampleRawResults;
+import load_test_service.api.statistic.results.SampleStatistic;
 import load_test_service.statistic.readers.RawDataReader;
 import load_test_service.statistic.readers.StatisticAggregatedReader;
 import load_test_service.storage.schema.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class StatisticEntityManager {
+    private static final RawCache rawCache = new RawCache();
 
     /**
      * Calculate statistic and save it to store
@@ -124,14 +127,84 @@ public class StatisticEntityManager {
         }
     }
 
-    public Map<TestID, TestBuildStatistic> getRawStatistic(@NotNull InputStream artifact) throws FileFormatException {
-        RawDataReader reader = new RawDataReader();
-        reader.processFile(artifact);
-
-        return reader.getTests();
+    /**
+     * Raw statistic : SRT and RPS
+     * @param buildID
+     * @param artifactName
+     * @param artifact
+     * @return
+     * @throws FileFormatException
+     */
+    public Map<TestID, SampleRawResults> getRawStatistic(@NotNull BuildID buildID, @NotNull String artifactName, @NotNull Entity artifact) throws FileFormatException {
+        synchronized (rawCache) {
+            Map<TestID, SampleRawResults> cached = rawCache.getRawResults(buildID, artifactName);
+            if (cached == null) {
+                RawDataReader reader = new RawDataReader();
+                reader.processFile(artifact.getBlob(ArtifactEntity.Blob.CONTENT.name()));
+                cached = reader.getSamples();
+                rawCache.addRawStatistic(buildID, artifactName, cached);
+            }
+            return cached;
+        }
     }
 
-    public void getCountedStatistic(@NotNull StoreTransaction txn, @NotNull final BuildID buildID, @NotNull final Entity build) {
-
+    @Nullable
+    public SampleRawResults getSampleRawStatistic(@NotNull BuildID buildID, @NotNull String artifactName, @NotNull Entity artifact, @NotNull TestID testID) throws FileFormatException {
+        synchronized (rawCache) {
+            Map<TestID, SampleRawResults> cached = rawCache.getRawResults(buildID, artifactName);
+            if (cached == null) {
+                RawDataReader reader = new RawDataReader();
+                reader.processFile(artifact.getBlob(ArtifactEntity.Blob.CONTENT.name()));
+                cached = reader.getSamples();
+                rawCache.addRawStatistic(buildID, artifactName, cached);
+            }
+            return cached.get(testID);
+        }
     }
+
+    /**
+     * Aggregated statistic : Average, Min, Max, 90% line
+     * @param buildType
+     * @return
+     */
+    public Map<TestID, SampleStatistic> getStatistic(@NotNull Entity buildType) {
+        EntityIterable entSamples = buildType.getLinks(BuildTypeEntity.Link.TO_SAMPLES.name());
+        EntityIterable entBuilds = buildType.getLinks(BuildTypeEntity.Link.TO_BUILDS.name());
+        if (entSamples.isEmpty() || entBuilds.isEmpty()) return Collections.emptyMap();
+
+        Map<TestID, SampleStatistic> results = new HashMap<>();
+        for (Entity entSample : entSamples) {
+            String name = (String) entSample.getProperty(SampleEntity.Property.SAMPLE_NAME.name());
+            String threadGroup = (String) entSample.getProperty(SampleEntity.Property.THREAD_GROUP.name());
+
+            if (name == null || threadGroup == null) {
+                continue;
+            }
+            TestID id = new TestID(threadGroup, name);
+            SampleStatistic sample = results.get(id);
+            if (sample == null) {
+                sample = new SampleStatistic(id);
+                results.put(id, sample);
+            }
+
+            EntityIterable values = entSample.getLinks(SampleEntity.Link.TO_SAMPLE_VALUE.name());
+            for (Entity entValue : values) {
+                String buildId = (String) entValue.getProperty(SampleValue.Property.BUILD_ID.name());
+                String metric = (String) entValue.getProperty(SampleValue.Property.METRIC.name());
+                String subMetric = (String) entValue.getProperty(SampleValue.Property.SUB_METRIC.name());
+                long value = Long.valueOf(entValue.getBlobString(SampleValue.Blob.VALUE.name()));
+
+                if (subMetric != null && !subMetric.isEmpty())
+                    metric += " ( " + subMetric + " )";
+                sample.addMetricValue(metric, Long.valueOf(buildId), value);
+            }
+        }
+        return results;
+    }
+
+    @Nullable
+    public SampleStatistic getSampleStatistic(@NotNull Entity buildType, @NotNull TestID testID){
+        return getStatistic(buildType).get(testID);
+    }
+
 }

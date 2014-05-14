@@ -1,15 +1,14 @@
 package load_test_service.api;
 
 import load_test_service.ProjectTree;
-import load_test_service.api.exeptions.FileFormatException;
 import load_test_service.api.model.BuildID;
 import load_test_service.api.model.BuildType;
 import load_test_service.api.model.TestBuild;
 import load_test_service.api.statistic.StatisticProperties;
-import load_test_service.api.statistic.TestBuildStatistic;
 import load_test_service.api.statistic.TestID;
 import load_test_service.api.statistic.metrics.Metric;
-import load_test_service.api.statistic.results.Sample;
+import load_test_service.api.statistic.results.SampleRawResults;
+import load_test_service.api.statistic.results.SampleStatistic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -137,14 +136,7 @@ public interface LoadService {
      */
     boolean countStatistic(@NotNull final BuildID buildID, @NotNull final String artifactName, @NotNull final StatisticProperties properties);
 
-    /**
-     * Return RPS and SRT chart values
-     * @param buildID
-     * @param artifactName
-     * @return
-     * @throws FileFormatException
-     */
-    Map<TestID, TestBuildStatistic> getRawStatistic(@NotNull final BuildID buildID, @NotNull final String artifactName) throws FileFormatException;
+
 
 
     boolean isStatisticCalculated(@NotNull final BuildID buildID, @NotNull final String artifactName);
@@ -155,17 +147,20 @@ public interface LoadService {
     @NotNull
     Collection<String> getArtifactsWithoutStat(@NotNull final BuildID buildID);
 
+
+
+//  All samples
     @NotNull
-    Collection<Sample> getStatistic(@NotNull final String buildTypeID);
+    Map<TestID, SampleStatistic> getStatistic(@NotNull final String buildTypeID);
 
-//    @Nullable
-//    List<TestID> getAllTests(@NotNull final BuildID buildID);
-//    @Nullable
-//    List<String> getAllThreadGroups(@NotNull final BuildID buildID);
+    @NotNull
+    Map<TestID, SampleRawResults> getRawStatistic(@NotNull final BuildID buildID, @NotNull final String artifactName);
 
-//    @Nullable
-//    List<String> getTestsInThreadGroup(@NotNull final BuildID buildID, String testGroup);
-//    Map<TestID, TestBuildTypeStatistic> getAggregatedStatistic(@NotNull BuildID buildID, @NotNull final String artifactName, @NotNull StatisticProperties properties) throws FileFormatException;
 
-//    Map<String, List<Long>> getAggregatedStatistic(@NotNull final String buildTypeID, StatisticMetrics[] metrics);
+//  By samples
+    @Nullable
+    SampleStatistic getSampleStatistic(@NotNull final String buildTypeID, @NotNull TestID testID);
+
+    @Nullable
+    SampleRawResults getSampleRawStatistic(@NotNull final BuildID buildID, @NotNull final String artifactName, @NotNull TestID testID);
 }

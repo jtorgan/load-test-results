@@ -13,7 +13,7 @@ public final class BuildEntity {
     }
 
     public static enum Blob {
-        NUMBER, ARTIFACT_NAMES, BUILD_TYPE_NAME
+        NUMBER, BUILD_TYPE_NAME
     }
 
     public static enum Link {

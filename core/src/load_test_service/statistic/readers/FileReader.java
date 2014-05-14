@@ -28,57 +28,6 @@ public abstract class FileReader {
     }
 
     protected abstract void processLine(String line) throws FileFormatException;
-
-
-
-
-
-    /**
-     * Helper to log failed items in temp files
-     */
-    protected final static class FileHelper {
-
-        private static void appendLineToFile(String fileName, String line) {
-            BufferedWriter out = null;
-            try {
-                out = new BufferedWriter(new FileWriter(fileName, true));
-                out.write(line + "\n");
-                out.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-
-        private static String getFileContent(String fileName) {
-            BufferedReader in = null;
-            StringBuilder builder = new StringBuilder();
-            try {
-                in = new BufferedReader(new java.io.FileReader(fileName));
-                while (in.ready()) {
-                    builder.append(in.readLine()).append("\n");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            return builder.toString();
-        }
-    }
 }
 
 

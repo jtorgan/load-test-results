@@ -2,7 +2,8 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@taglib prefix="template" tagdir="/WEB-INF/tags" %>
+
+<%@taglib prefix="base" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="projects" type="java.util.List<load_test_service.ProjectTree>"--%>
 <%--@elvariable id="saved_bt" type="java.util.List<load_test_service.api.model.BuildType>"--%>
@@ -28,7 +29,7 @@
 
     <div class="tc-projects">
         <c:forEach items="${projects}" var="project">
-            <template:projectTree project="${project}"/>
+            <base:projectTree project="${project}"/>
         </c:forEach>
     </div>
 </div>

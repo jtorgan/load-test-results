@@ -59,7 +59,7 @@ public class TCAnalyzer implements Runnable {
                         final Map<String, String> artifacts = RESTCommandImpl.GET_ARTIFACT_PATHS.execute(client, build.getID().getBuildID(), bt.getPatterns());
                         if (artifacts != null && !artifacts.isEmpty()) {
 
-                            build.setArtifacts(artifacts.keySet());
+//                            build.setArtifacts(artifacts.keySet());
                             // todo: if happens some exception  ?? => revert transaction, not to save build
                             // or must load full build info, including all artifacts before show build as loaded
                             final Thread currentThread = Thread.currentThread();

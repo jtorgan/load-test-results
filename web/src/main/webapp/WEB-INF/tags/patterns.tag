@@ -4,23 +4,6 @@
 <%@attribute name="patterns" type="java.lang.String[]" required="false"%>
 
 
-<%--<script>
-    $(function() {
-        $('.update-patterns').bind('click' ,function() {
-
-            var form = $(this).closest("form");
-/*            var buildTypeID = $(form).filter("input").val();
-            $.ajax({
-                type: "post",
-                url: "setPatterns",
-                data: {buildTypeID: buildTypeID, buildID: buildID}
-            }).done(function (data) {
-                        $("#artifact-list").html(data);
-                    });*/
-        });
-    });
-</script>--%>
-
 <input type="hidden" name="buildTypeID" value="${bt}">
 <div>Artifacts patterns:</div>
 <textarea rows="10" cols="45" name="patterns" wrap="soft">

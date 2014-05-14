@@ -3,8 +3,11 @@ package load_test_service.storage.binding;
 import jetbrains.exodus.database.Entity;
 import jetbrains.exodus.database.EntityIterable;
 import jetbrains.exodus.database.StoreTransaction;
-import jetbrains.exodus.database.impl.bindings.StringBinding;
-import load_test_service.api.model.*;
+import load_test_service.api.model.BuildID;
+import load_test_service.api.model.Change;
+import load_test_service.api.model.DependencyBuild;
+import load_test_service.api.model.TestBuild;
+import load_test_service.storage.schema.ArtifactEntity;
 import load_test_service.storage.schema.BuildEntity;
 import load_test_service.storage.schema.DependencyEntity;
 import org.jetbrains.annotations.NotNull;
@@ -73,10 +76,14 @@ public class BuildBinding {
                 build.addDependency(dependency);
             }
         }
-
-        InputStream stream = entity.getBlob(BuildEntity.Blob.ARTIFACT_NAMES.name());
-        if (stream != null)
-            build.setArtifacts(CollectionConverter.<String>fromInputStream(stream, StringBinding.BINDING));
+        final EntityIterable entArtifacts = entity.getLinks(BuildEntity.Link.TO_ARTIFACT.name());
+        if (!entArtifacts.isEmpty()) {
+            for(Entity entArtifact : entArtifacts) {
+                String artifactName = (String) entArtifact.getProperty(ArtifactEntity.Property.NAME.name());
+                Boolean isProcessed = (Boolean) entArtifact.getProperty(ArtifactEntity.Property.IS_PROCESSED.name());
+                build.addArtifact(artifactName, isProcessed == null ? false : isProcessed);
+            }
+        }
         return build;
     }
 

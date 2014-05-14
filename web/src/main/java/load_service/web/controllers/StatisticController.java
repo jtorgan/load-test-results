@@ -19,12 +19,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by Yuliya.Torhan on 5/5/14.
- */
 @Controller
 @RequestMapping("/statistic")
 public class StatisticController {
+
     private final LoadService service;
 
     public StatisticController(@NotNull final LoadService service) {
@@ -46,19 +44,6 @@ public class StatisticController {
         return "buildStatForm";
     }
 
-
-    @RequestMapping(value = "/artWithStat", method = RequestMethod.GET)
-    public String getArtifactsWithStat(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
-                                       @RequestParam(value = "buildID", required = true) String buildID,
-                                       ModelMap model) {
-        BuildID id = new BuildID(buildTypeID, buildID);
-        TestBuild build = service.getBuild(id);
-        if (build != null) {
-            model.addAttribute("build", build);
-            model.addAttribute("artifacts", service.getArtifactsWithStat(id));
-        }
-        return "buildArtifactsWithStat";
-    }
 
     @RequestMapping(value = "/calculate", method = RequestMethod.POST)
     public ResponseEntity calculateStatistic(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
@@ -90,13 +75,36 @@ public class StatisticController {
 
     @RequestMapping(value = "/showStat", method = RequestMethod.GET)
     public String showStat(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
-                           @RequestParam(value = "buildID", required = true) String buildID,
-                           @RequestParam(value = "path", required = true) String path,
                            ModelMap model) {
-		//todo: show page with statistic
+        model.put("samples", service.getStatistic(buildTypeID));
+        return "statByBuilds-Aggregated";
+    }
+
+    @RequestMapping(value = "/showRawStat", method = RequestMethod.GET)
+    public String showRawStat(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
+                           @RequestParam(value = "buildID", required = true) String buildID,
+                           @RequestParam(value = "artifact", required = true) String artifact,
+                           ModelMap model) {
         BuildID id = new BuildID(buildTypeID, buildID);
         model.put("build", service.getBuild(id));
-        model.put("samples", service.getStatistic(buildTypeID));
-        return "statistic";
+        model.put("rawResults", service.getRawStatistic(id, artifact));
+        return "statBuild-SRT-RPS";
     }
+
+/*    @RequestMapping(value = "/showSamplerCharts", method = RequestMethod.GET)
+    public String showSamplerCharts(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
+                           @RequestParam(value = "buildID", required = true) String buildID,
+                           @RequestParam(value = "artifact", required = true) String artifact,
+                           @RequestParam(value = "threadGroup", required = true) String threadGroup,
+                           @RequestParam(value = "testName", required = true) String testName,
+                           ModelMap model) {
+        //todo: show page with statistic
+        BuildID id = new BuildID(buildTypeID, buildID);
+        TestID testsID = new TestID(threadGroup, testName);
+        model.put("build", service.getBuild(id));
+        model.put("rawStat", service.getSampleRawStatistic(id, artifact, testsID));
+        model.put("stat", service.getSampleStatistic(buildTypeID, testsID));
+
+        return "/WEB-INF/_tmp/samplerCharts.jsp";
+    }*/
 }

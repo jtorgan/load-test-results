@@ -1,4 +1,4 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="template" tagdir="/WEB-INF/tags" %>
 
 <%@attribute name="dependencyList" type="java.util.Collection<load_test_service.api.model.DependencyBuild>" required="true" %>

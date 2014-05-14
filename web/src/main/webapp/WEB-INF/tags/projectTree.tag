@@ -1,7 +1,7 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="template" tagdir="/WEB-INF/tags" %>
 
 <%@attribute name="project" type="load_test_service.ProjectTree" required="true" %>
-<%@taglib prefix="template" tagdir="/WEB-INF/tags" %>
 
 <div class="sub-project">
     <div id="${project.ID}" class="bt-item-list">

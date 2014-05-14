@@ -3,26 +3,23 @@ package load_test_service.api.model;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class TestBuild extends BaseBuildInfo {
     private List<DependencyBuild> dependencyList;
 
-    private Collection<String> artifacts;
+    private Map<String, Boolean> artifacts;
 
     public TestBuild(@NotNull BuildID id) {
         super(id);
     }
 
     @Nullable
-    public Collection<String> getArtifacts() {
+    public Map<String, Boolean> getArtifacts() {
         return artifacts;
     }
 
-    public void setArtifacts(Collection<String> artifacts) {
+    public void setArtifacts(Map<String, Boolean> artifacts) {
         this.artifacts = artifacts;
     }
 
@@ -43,7 +40,7 @@ public class TestBuild extends BaseBuildInfo {
         StringBuilder result = new StringBuilder(super.toString());
         result.append("\nTest build:\n");
         if (artifacts != null && !artifacts.isEmpty())
-            result.append("artifacts: ").append(Arrays.toString(artifacts.toArray()));
+            result.append("artifacts: ").append(Arrays.toString(artifacts.keySet().toArray()));
         if (dependencyList != null && !dependencyList.isEmpty()) {
             result.append("dependencyCount: ").append(dependencyList.size());
             result.append("dependencyNames: [");
@@ -52,5 +49,16 @@ public class TestBuild extends BaseBuildInfo {
             result.append("]");
         }
         return result.toString();
+    }
+
+    public boolean hasStatistic() {
+        return artifacts != null && artifacts.values().contains(true);
+    }
+
+    public void addArtifact(@NotNull String artifactName, boolean isProcessed) {
+        if (artifacts == null) {
+            artifacts = new HashMap<>();
+        }
+        artifacts.put(artifactName, isProcessed);
     }
 }

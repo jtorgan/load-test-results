@@ -3,15 +3,14 @@ package load_service.web;
 import load_test_service.LoadServiceFactory;
 import load_test_service.ProjectTree;
 import load_test_service.api.LoadService;
-import load_test_service.api.exeptions.FileFormatException;
 import load_test_service.api.model.BuildID;
 import load_test_service.api.model.BuildType;
 import load_test_service.api.model.TestBuild;
 import load_test_service.api.statistic.StatisticProperties;
-import load_test_service.api.statistic.TestBuildStatistic;
 import load_test_service.api.statistic.TestID;
 import load_test_service.api.statistic.metrics.Metric;
-import load_test_service.api.statistic.results.Sample;
+import load_test_service.api.statistic.results.SampleRawResults;
+import load_test_service.api.statistic.results.SampleStatistic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -122,9 +121,22 @@ public class LoadServiceWebAdapter implements LoadService {
         return myService.countStatistic(buildID, artifactName, properties);
     }
 
+    @NotNull
     @Override
-    public Map<TestID, TestBuildStatistic> getRawStatistic(@NotNull BuildID buildID, @NotNull String artifactName) throws FileFormatException {
+    public Map<TestID, SampleRawResults> getRawStatistic(@NotNull BuildID buildID, @NotNull String artifactName){
         return myService.getRawStatistic(buildID, artifactName);
+    }
+
+    @Nullable
+    @Override
+    public SampleStatistic getSampleStatistic(@NotNull String buildTypeID, @NotNull TestID testID) {
+        return myService.getSampleStatistic(buildTypeID, testID);
+    }
+
+    @Nullable
+    @Override
+    public SampleRawResults getSampleRawStatistic(@NotNull BuildID buildID, @NotNull String artifactName, @NotNull TestID testID) {
+        return myService.getSampleRawStatistic(buildID, artifactName, testID);
     }
 
     @Override
@@ -146,7 +158,7 @@ public class LoadServiceWebAdapter implements LoadService {
 
     @NotNull
     @Override
-    public Collection<Sample> getStatistic(@NotNull String buildTypeID) {
+    public Map<TestID, SampleStatistic> getStatistic(@NotNull String buildTypeID) {
         return myService.getStatistic(buildTypeID);
     }
 }
