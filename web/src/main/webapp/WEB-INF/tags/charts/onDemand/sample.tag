@@ -2,6 +2,7 @@
 
 <%@attribute name="id" type="java.lang.String" required="true" %>
 <%@attribute name="sample" type="load_test_service.api.statistic.results.SampleStatistic" required="true" %>
+<%@attribute name="settings" type="load_service.web.DefaultChartSettings" required="true" %>
 
 <%@taglib prefix="base" tagdir="/WEB-INF/tags" %>
 
@@ -28,8 +29,10 @@
         (function() {
             var statData = [
                 <c:forEach items="${sample.metricValues}" var="metric" varStatus="loopOuter">
+                    <c:set var="key" value="${metric.key}"/>
                     {
-                        key: "${metric.key}",
+                        key: "${key}",
+                        disabled: ${settings.settings[key] == true},
                         values: [
                             <c:forEach items="${metric.value}" var="value" varStatus="loopInner">
                                 { x: "${value.x}" , y: ${value.y} }

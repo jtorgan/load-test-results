@@ -6,8 +6,9 @@
 <%@taglib prefix="charts" tagdir="/WEB-INF/tags/charts" %>
 <%@taglib prefix="chartsOnDemand" tagdir="/WEB-INF/tags/charts/onDemand" %>
 
-<%--@elvariable id="buildTypeID" type="java.lang.String"--%>
+<%--@elvariable id="buildType" type="load_test_service.api.model.BuildType"--%>
 <%--@elvariable id="samples" type="java.util.Map<load_test_service.api.statistic.TestID, load_test_service.api.statistic.results.SampleStatistic>"--%>
+<%--@elvariable id="settings" type="load_service.web.DefaultChartSettings"--%>
 
 <c:set var="req" value="${pageContext.request}" />
 <c:set var="baseURL" value="${req.scheme}://${req.serverName}:${req.serverPort}${req.contextPath}" />
@@ -23,31 +24,26 @@
     <link rel="stylesheet" href="/resources/css/charts.css">
 
     <script type="text/javascript" src="/resources/js/charts.js"></script>
-    <style>
-        .nv-axisMaxMin text {
-            font-weight: normal !important;
-        }
-
-        .sample {
-            display: block;
-            width: 100%;
-            border-bottom: 1px solid #86a4c3;
-        }
-        .chart {
-            height: auto;
-            width: 100%;
-        }
-    </style>
 </head>
 <body>
 
 <div id="btInfo">
     <%--todo: build type info--%>
+    <table>
+        <tr><td>Build configuration</td><td>${buildType.name}</td></tr>
+        <tr><td>Parent project</td><td>${buildType.projectName}</td></tr>
+        <tr><td>Monitoring status</td><td>${buildType.monitored}</td></tr>
+        <tr><td>Last loaded build (ID)</td><td>${buildType.lastBuildID}</td></tr>
+    </table>
+</div>
+
+<div id="default_settings">
+    <charts:defaultChartSettings buildTypeID="${buildType.ID}" settings="${settings}"/>
 </div>
 
 <c:set var="id" value="1"/>
 <c:forEach var="sample" items="${samples}">
-    <chartsOnDemand:sample id="${id}" sample="${sample.value}"/>
+    <chartsOnDemand:sample id="${id}" sample="${sample.value}" settings="${settings}"/>
     <c:set var="id" value="${id+1}"/>
 </c:forEach>
 

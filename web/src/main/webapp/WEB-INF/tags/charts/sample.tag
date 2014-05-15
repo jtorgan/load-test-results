@@ -2,6 +2,7 @@
 
 <%@attribute name="id" type="java.lang.String" required="true" %>
 <%@attribute name="sample" type="load_test_service.api.statistic.results.SampleStatistic" required="true" %>
+<%@attribute name="default" type="java.util.Map<java.lang.String,java.lang.Boolean>" required="true" %>
 
 <%@taglib prefix="base" tagdir="/WEB-INF/tags" %>
 
@@ -25,6 +26,7 @@
                 <c:forEach items="${sample.metricValues}" var="metric" varStatus="loopOuter">
                 {
                     key: "${metric.key}",
+                    disabled: ${default[metric.key]},
                     values: [
                         <c:forEach items="${metric.value}" var="value" varStatus="loopInner">
                         { x: "${value.x}" , y: ${value.y} }

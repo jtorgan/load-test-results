@@ -1,5 +1,6 @@
 package load_service.web.controllers;
 
+import load_service.web.DefaultChartSettings;
 import load_test_service.api.LoadService;
 import load_test_service.api.model.BuildID;
 import load_test_service.api.model.TestBuild;
@@ -22,7 +23,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/statistic")
 public class StatisticController {
-
     private final LoadService service;
 
     public StatisticController(@NotNull final LoadService service) {
@@ -47,18 +47,19 @@ public class StatisticController {
 
     @RequestMapping(value = "/calculate", method = RequestMethod.POST)
     public ResponseEntity calculateStatistic(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
-                            @RequestParam(value = "buildID", required = true) String buildID,
-                            @RequestParam(value = "metrics", required = true) String[] metrics,
-                            @RequestParam(value = "artifact", required = true) String artifact,
-                            @RequestParam(value = "threadGroup", required = true) boolean threadGroup,
-                            @RequestParam(value = "total", required = true) boolean total) {
+                                             @RequestParam(value = "buildID", required = true) String buildID,
+                                             @RequestParam(value = "metrics", required = true) String[] metrics,
+                                             @RequestParam(value = "artifact", required = true) String artifact,
+                                             @RequestParam(value = "threadGroup", required = true) boolean threadGroup,
+                                             @RequestParam(value = "total", required = true) boolean total) {
         BuildID id = new BuildID(buildTypeID, buildID);
         StatisticProperties props = new StatisticProperties();
         List<Metric> metricList = new ArrayList<Metric>();
         for (String metric : metrics) {
             Metric m = BaseMetrics.valueOf(metric);
             if (m == BaseMetrics.RESPONSE_CODE) {
-                props.calculateResponseCodes(true); continue;
+                props.calculateResponseCodes(true);
+                continue;
             }
             if (m != null)
                 metricList.add(m);
@@ -76,35 +77,36 @@ public class StatisticController {
     @RequestMapping(value = "/showStat", method = RequestMethod.GET)
     public String showStat(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
                            ModelMap model) {
+        model.put("buildType", service.getBuildType(buildTypeID));
         model.put("samples", service.getStatistic(buildTypeID));
+        model.put("default", new DefaultChartSettings(buildTypeID));
         return "statistic";
     }
 
     @RequestMapping(value = "/showRawStat", method = RequestMethod.GET)
     public String showRawStat(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
-                           @RequestParam(value = "buildID", required = true) String buildID,
-                           @RequestParam(value = "artifact", required = true) String artifact,
-                           ModelMap model) {
+                              @RequestParam(value = "buildID", required = true) String buildID,
+                              @RequestParam(value = "artifact", required = true) String artifact,
+                              ModelMap model) {
         BuildID id = new BuildID(buildTypeID, buildID);
         model.put("build", service.getBuild(id));
         model.put("rawResults", service.getRawStatistic(id, artifact));
         return "statisticRaw";
     }
 
-/*    @RequestMapping(value = "/showSamplerCharts", method = RequestMethod.GET)
-    public String showSamplerCharts(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
-                           @RequestParam(value = "buildID", required = true) String buildID,
-                           @RequestParam(value = "artifact", required = true) String artifact,
-                           @RequestParam(value = "threadGroup", required = true) String threadGroup,
-                           @RequestParam(value = "testName", required = true) String testName,
-                           ModelMap model) {
-        //todo: show page with statistic
-        BuildID id = new BuildID(buildTypeID, buildID);
-        TestID testsID = new TestID(threadGroup, testName);
-        model.put("build", service.getBuild(id));
-        model.put("rawStat", service.getSampleRawStatistic(id, artifact, testsID));
-        model.put("stat", service.getSampleStatistic(buildTypeID, testsID));
+    @RequestMapping(value = "/saveDefaultSettings", method = RequestMethod.POST)
+    public ResponseEntity showSamplerCharts(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
+                                            @RequestParam(value = "min", required = false) Boolean min,
+                                            @RequestParam(value = "max", required = false) Boolean max,
+                                            @RequestParam(value = "average", required = false) Boolean average,
+                                            @RequestParam(value = "line90", required = false) Boolean line90) {
+        DefaultChartSettings settings = new DefaultChartSettings(buildTypeID);
+        if (min != null) settings.setDeselectedMetric(BaseMetrics.MIN);
+        if (max != null) settings.setDeselectedMetric(BaseMetrics.MAX);
+        if (average != null) settings.setDeselectedMetric(BaseMetrics.AVERAGE);
+        if (line90 != null) settings.setDeselectedMetric(BaseMetrics.LINE90);
+        return settings.storeSettings() ? new ResponseEntity(HttpStatus.OK) : new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
-        return "/WEB-INF/_tmp/samplerCharts.jsp";
-    }*/
+
 }
