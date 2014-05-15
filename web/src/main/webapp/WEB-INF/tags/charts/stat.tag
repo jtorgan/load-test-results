@@ -3,7 +3,7 @@
 <%@attribute name="id" type="java.lang.String" required="true" %>
 <%@attribute name="metricValues" type="java.util.Map<java.lang.String, java.util.List<load_test_service.api.statistic.results.Value>>" required="true" %>
 
-<div id="statSVG${id}" class="chart" style="display: none">
+<div id="statSVG${id}" class="chart">
     <svg></svg>
 </div>
 

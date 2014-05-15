@@ -28,9 +28,9 @@
 
     <table class="stat-form" cellspacing="5">
         <tr>
-            <th>Performance metrics</th>
-            <th>Settings</th>
-            <th>Enable artifacts</th>
+            <th style="width: 20%">Metrics</th>
+            <th style="width: 35%">Settings</th>
+            <th style="width: 45%">Enable artifacts</th>
         </tr>
         <tr>
             <td>

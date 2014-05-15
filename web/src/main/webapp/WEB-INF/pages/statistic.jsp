@@ -20,6 +20,8 @@
     <script type="text/javascript" src="/resources/nvd3/nv.d3.js"></script>
     <link href="/resources/nvd3/nv.d3.css" rel="stylesheet" type="text/css">
 
+    <link rel="stylesheet" href="/resources/css/charts.css">
+
     <script type="text/javascript" src="/resources/js/charts.js"></script>
     <style>
         .nv-axisMaxMin text {

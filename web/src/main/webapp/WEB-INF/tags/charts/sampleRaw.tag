@@ -6,9 +6,9 @@
 <%@taglib prefix="base" tagdir="/WEB-INF/tags" %>
 
 
-<div id="sample${id}" class="sample">
+<div id="sample${id}" class="sample sample-open">
 
-    <div id="sampleTitle${id}">
+    <div id="sampleTitle${id}" class="title-open">
         <strong>
             <base:sampleName threadGroup="${sample.threadGroup}" name="${sample.name}"/>
         </strong>

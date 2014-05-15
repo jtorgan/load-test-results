@@ -6,9 +6,9 @@
 <%@taglib prefix="base" tagdir="/WEB-INF/tags" %>
 
 
-<div id="sample${id}" class="sample">
+<div id="sample${id}" class="sample sample-hide">
 
-    <div id="sampleTitle${id}" style="padding: 5px 0; cursor: pointer" title="Click to show SRT and RPS charts">
+    <div id="sampleTitle${id}" class="title-hide" title="Click to show SRT and RPS charts">
         <strong>
             <base:sampleName threadGroup="${sample.threadGroup}" name="${sample.name}"/>
         </strong>
@@ -57,8 +57,12 @@
 
                 if (charts.style.display == "none") {
                     charts.style.display = "inline";
+                    document.getElementById("sample${id}").className = "sample sample-open";
+                    document.getElementById('sampleTitle${id}').className = "title-open";
                 } else if (charts.style.display == "inline") {
                     charts.style.display = "none";
+                    document.getElementById("sample${id}").className = "sample sample-hide";
+                    document.getElementById('sampleTitle${id}').className = "title-hide";
                 }
 
                 if (!loaded) {

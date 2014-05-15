@@ -19,7 +19,7 @@
     <link href="/resources/css/common.css" rel="stylesheet">
 </head>
 <body>
-<div class="frame" style="border-right: 1px solid #86a4c3; height: 60%; margin-top: 1%; padding-right: 1%">
+<div class="frame" style="border-right: 1px solid #e4e4e4; height: 58%; margin-top: 1%; padding-right: 1%">
 
     <div class="frame-title">TeamCity projects</div>
 
@@ -34,7 +34,7 @@
     </div>
 </div>
 
-<div class="right frame" style="height: 60%; margin-top: 1%">
+<div class="right frame" style="height: 58%; margin-top: 1%">
     <div class="frame-title">Monitored build configurations</div>
 
     <table class="bt-item-saved-container" style="table-layout: fixed;">
@@ -48,7 +48,7 @@
     </table>
 </div>
 
-<div class="frame" style="height: 40%; padding-right: 1%">
+<div class="frame" style="height: 38%; padding-right: 1%; border-right: 1px solid #E4E4E4; margin-bottom: 1% ">
     <div class="frame-title">Build configs in project</div>
     <div class="bt-list" style="float: left; padding: 5px 10px; width: 95%">
     </div>

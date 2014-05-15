@@ -39,7 +39,7 @@
 </div>
 
     <input type="hidden" id="btID" value="${buildTypeID}">
-    <div class="frame" style="border-right: 1px solid #86a4c3; max-height: 90%; height: 90%; padding-bottom: 5px; width: 60%">
+    <div class="frame" style="border-right: 1px solid #e4e4e4; max-height: 95%; height: 90%; padding-bottom: 5px; width: 60%">
         <div class="frame-title">Builds (<span id="count">${count}</span>) </div>
         <div class="bt-container">
             <table style="width: 100%; border-spacing: 0; max-height: 100%" id="builds">
@@ -85,8 +85,8 @@
 
 
     <div class="frame" style="max-height: 90%; height: 90%; padding-bottom: 5px; overflow: visible; width: 35%">
-        <div id="buildInfo" class="frame-block"></div>
-        <div id="statForm" class="frame-block"></div>
+        <div id="statForm" class="frame-block" style="height: 35%"></div>
+        <div id="buildInfo" class="frame-block" style="height: 60%; max-height: 60%"></div>
     </div>
 </body>
 </html>

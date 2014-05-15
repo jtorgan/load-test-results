@@ -37,18 +37,6 @@ function loadStatForm(buildID, buildTypeID) {
     });
 }
 
-/*function loadArtifacts(buildID, buildTypeID) {
-    $.ajax({
-        type: "get",
-        url: "/statistic/artWithStat",
-        data: {buildTypeID: buildTypeID, buildID: buildID}
-    }).done(function (data) {
-        $("#artWithStat").html(data);
-        currentBuild = buildID;
-    });
-}*/
-
-
 function removeBuild(index, div, bID, btID) {
     $.ajax({
         type: "post",
@@ -99,8 +87,8 @@ function calculateStatistic(bID, btID) {
 //            loadArtifacts(bID, btID);
             loadStatForm(bID, btID);
             var statCell = $("#" + bID + " .statistic");
-            statCell.html('<form action="/statistic/showStat" method="get" target="_blank"> <input type="hidden" name="buildID" value="' + bID +
-                '"> <input type="hidden" name="buildTypeID" value="' + btID + '"> <input type="hidden" name="path" value="' + artifact +
+            statCell.html('<form action="/statistic/showRawStat" method="get" target="_blank"> <input type="hidden" name="buildID" value="' + bID +
+                '"> <input type="hidden" name="buildTypeID" value="' + btID + '"> <input type="hidden" name="artifact" value="' + artifact +
                 '"> <a href="javascript:;" onclick="parentNode.submit();" title="Click to show calculated statistic">' + artifact +
                 '</a> </form>');
 

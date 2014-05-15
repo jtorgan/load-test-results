@@ -21,34 +21,24 @@
     <script type="text/javascript" src="/resources/nvd3/nv.d3.js"></script>
     <link href="/resources/nvd3/nv.d3.css" rel="stylesheet" type="text/css">
 
+    <link rel="stylesheet" href="/resources/css/charts.css">
     <script type="text/javascript" src="/resources/js/charts.js"></script>
+
     <style>
         #common {
-            width: 95%;
+            width: 100%;
             border: 1px solid #d0d0d0;
         }
         #common th {
             background-color: #e5e5e5;
+            text-align: left;
+            padding: 5px 10px;
         }
         #buildInfo {
             width: 35%;
         }
         #dependencies {
             width: 65%;
-        }
-
-        .nv-axisMaxMin text {
-            font-weight: normal !important;
-        }
-
-        .sample {
-            display: block;
-            width: 100%;
-            padding: 10px 0;
-            border-bottom: 1px solid #86a4c3;
-        }
-        .chart {
-            height: auto;
         }
     </style>
 </head>
@@ -69,15 +59,15 @@
                     <td>${build.ID.buildID}</td>
                 </tr>
                 <tr>
-                    <td>number</td>
+                    <td>Build #</td>
                     <td>${build.buildNumber}</td>
                 </tr>
                 <tr>
-                    <td>status</td>
+                    <td>Status</td>
                     <td><base:buildStatus status="${build.status}"/></td>
                 </tr>
                 <tr>
-                    <td>finish date</td>
+                    <td>Finish date</td>
                     <td><base:buildStatus status="${build.finishFormattedDate}"/></td>
                 </tr>
             </table>

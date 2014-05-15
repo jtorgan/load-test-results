@@ -9,7 +9,7 @@
     margin-bottom: 1%;
     width: 95%;
     float: left;
-    padding: 1%;
+    padding: 10px;
 }
 .remove {
     background: url("/resources/img/remove.png") no-repeat;
@@ -34,4 +34,8 @@
     padding: 1%;
     overflow-y: auto;
     height: 95%;
+}
+
+.sample {
+
 }
