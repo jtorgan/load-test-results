@@ -1,0 +1,25 @@
+.sample {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+}
+
+.sample-hide {
+    border-bottom: 1px solid #e4e4e4;
+}
+
+.sample-open {
+    border: 1px solid #e4e4e4;
+}
+
+.title-hide {
+    background-color: #ffffff;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.title-open {
+    background-color: #f6f6f6;
+    padding: 5px 10px;
+    cursor: pointer;
+}
