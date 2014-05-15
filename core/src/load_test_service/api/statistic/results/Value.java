@@ -1,9 +1,8 @@
 package load_test_service.api.statistic.results;
 
-/**
- * Created by Yuliya.Torhan on 5/14/14.
- */
-public class Value {
+import org.jetbrains.annotations.NotNull;
+
+public class Value implements Comparable<Value> {
     private final long x;
     private final long y;
 
@@ -18,5 +17,11 @@ public class Value {
 
     public long getY() {
         return y;
+    }
+
+    @Override
+    public int compareTo(@NotNull Value o) {
+        if (x == o.x) return 0;
+        return x < o.x ? -1 : 1;
     }
 }

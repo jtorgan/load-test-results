@@ -2,10 +2,7 @@ package load_test_service.api.statistic.results;
 
 import load_test_service.api.statistic.TestID;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Container for srt and _rps results
@@ -51,6 +48,7 @@ public class SampleRawResults {
             for (Long key : _rps.keySet()) {
                 rps.add(new Value(key, _rps.get(key)));
             }
+            Collections.sort(rps);
         }
         return rps;
     }
