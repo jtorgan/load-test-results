@@ -34,6 +34,7 @@ function createStatChart(id, data) {
         chart.forceY([0]);
         d3.select('#statSVG' + id + ' svg')
             .datum(data)
+            .transition(0)
             .call(chart)
         ;
         nv.utils.windowResize(chart.update);
@@ -72,6 +73,7 @@ function createSRTChart(id, data) {
 
         d3.select('#srtSVG' + id + ' svg')
             .datum(data)
+            .transition(0)
             .call(chart)
         ;
         nv.utils.windowResize(chart.update);
@@ -110,6 +112,7 @@ function createRPSChart(id, data) {
 
         d3.select('#rpsSVG' + id + ' svg')
             .datum(data)
+            .transition(0)
             .call(chart)
         ;
         nv.utils.windowResize(chart.update);

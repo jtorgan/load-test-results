@@ -77,7 +77,7 @@ public class StatisticController {
     public String showStat(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
                            ModelMap model) {
         model.put("samples", service.getStatistic(buildTypeID));
-        return "statByBuilds-Aggregated";
+        return "statistic";
     }
 
     @RequestMapping(value = "/showRawStat", method = RequestMethod.GET)
@@ -88,7 +88,7 @@ public class StatisticController {
         BuildID id = new BuildID(buildTypeID, buildID);
         model.put("build", service.getBuild(id));
         model.put("rawResults", service.getRawStatistic(id, artifact));
-        return "statBuild-SRT-RPS";
+        return "statisticRaw";
     }
 
 /*    @RequestMapping(value = "/showSamplerCharts", method = RequestMethod.GET)
