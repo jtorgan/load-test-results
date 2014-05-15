@@ -6,8 +6,8 @@ import load_test_service.api.statistic.results.SampleRawResults;
 import load_test_service.utils.StringUtils;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 /**
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class RawDataReader extends FileReader {
     private final Pattern delimiter = StringUtils.LOG_DELIMITER_PATTERN;
 
-    private final Map<TestID, SampleRawResults> samples = new HashMap<>();
+    private final Map<TestID, SampleRawResults> samples = new TreeMap<>();
 
     @Override
     protected void processLine(String line) throws FileFormatException {

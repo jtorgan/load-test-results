@@ -1,8 +1,9 @@
 package load_test_service.api.statistic;
 
+import load_test_service.statistic.BaseMetrics;
 import org.jetbrains.annotations.NotNull;
 
-public class TestID {
+public class TestID  implements Comparable<TestID> {
     private final String testGroup;
     private final String testName;
 
@@ -37,4 +38,22 @@ public class TestID {
         hash = hash + testName.length() * 17;
         return hash;
     }
+
+    @Override
+    public int compareTo(@NotNull TestID o) {
+        if (!testGroup.isEmpty() && o.testGroup.isEmpty()) return 1;
+        if (testGroup.isEmpty() && !o.testGroup.isEmpty()) return -1;
+        if (!testGroup.isEmpty() && !o.testGroup.isEmpty()) {
+            if (testGroup.equals(o.testGroup))  {
+                if (o.testName.equals(BaseMetrics.TOTAL_NAME)) return -1;
+                if (testName.equals(BaseMetrics.TOTAL_NAME)) return 1;
+                return testName.compareTo(o.testName);
+            }
+            return testGroup.compareTo(o.testGroup);
+        }
+        if (o.testName.equals(BaseMetrics.TOTAL_NAME)) return -1;
+        if (testName.equals(BaseMetrics.TOTAL_NAME)) return 1;
+        return testName.compareTo(o.testName);
+    }
+
 }

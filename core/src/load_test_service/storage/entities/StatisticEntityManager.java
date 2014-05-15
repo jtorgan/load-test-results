@@ -17,10 +17,7 @@ import load_test_service.storage.schema.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StatisticEntityManager {
     private static final RawCache rawCache = new RawCache();
@@ -172,7 +169,7 @@ public class StatisticEntityManager {
         EntityIterable entBuilds = buildType.getLinks(BuildTypeEntity.Link.TO_BUILDS.name());
         if (entSamples.isEmpty() || entBuilds.isEmpty()) return Collections.emptyMap();
 
-        Map<TestID, SampleStatistic> results = new HashMap<>();
+        Map<TestID, SampleStatistic> results = new TreeMap<>();
         for (Entity entSample : entSamples) {
             String name = (String) entSample.getProperty(SampleEntity.Property.SAMPLE_NAME.name());
             String threadGroup = (String) entSample.getProperty(SampleEntity.Property.THREAD_GROUP.name());
