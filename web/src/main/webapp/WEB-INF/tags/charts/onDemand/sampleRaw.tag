@@ -14,26 +14,17 @@
         </strong>
     </div>
 
-    <table id="chart${id}" style="width: 100%; display: none; height: 250px">
-        <tr id="load${id}" style="display: none">
-            <td style="text-align: center">
-                <img src="/resources/img/loading.gif">
-            </td>
-        </tr>
-
-        <tr>
-            <td>
-                <div id="srtSVG${id}" style="height: 280px">
-                    <svg></svg>
-                </div>
-            </td>
-            <td>
-                <div id="rpsSVG${id}" style="height: 280px">
-                    <svg></svg>
-                </div>
-            </td>
-        </tr>
-    </table>
+    <div id="chart${id}" style="width: 100%; display: none; height: 500px">
+        <div id="load${id}" style="display: none; width: 100%">
+            <img src="/resources/img/loading.gif">
+        </div>
+        <div id="srtSVG${id}" style="height: 280px; width: 1800px">
+            <svg></svg>
+        </div>
+        <div id="rpsSVG${id}" style="height: 280px; width: 1800px">
+            <svg></svg>
+        </div>
+    </div>
 
     <script type="text/javascript">
         (function() {
@@ -65,15 +56,15 @@
                 var charts = document.getElementById("chart${id}");
 
                 if (charts.style.display == "none") {
-                    charts.style.display = "table";
-                } else if (charts.style.display == "table") {
+                    charts.style.display = "inline";
+                } else if (charts.style.display == "inline") {
                     charts.style.display = "none";
                 }
 
                 if (!loaded) {
                     document.getElementById("load${id}").style.display = "block";
-                    createSRTChart(${id}, srtData);
-                    createRPSChart(${id}, rpsData);
+                    createSRTChart(${id}, srtData, 1800, 320);
+                    createRPSChart(${id}, rpsData, 1800, 320);
                     document.getElementById("load${id}").style.display = "none";
                     loaded = true;
                 }

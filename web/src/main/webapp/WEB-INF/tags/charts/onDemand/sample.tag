@@ -50,7 +50,7 @@
             }
             if (!loaded) {
                 document.getElementById("load${id}").style.display = "block";
-                createStatChart(${id}, statData);
+                createStatChart(${id}, statData, 800, 320);
                 document.getElementById("load${id}").style.display = "none";
                 loaded = true;
             }

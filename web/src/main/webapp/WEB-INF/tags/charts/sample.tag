@@ -35,7 +35,7 @@
                 ${not loopOuter.last ? "," : ""}
                 </c:forEach>
             ];
-            createStatChart(${id}, statData);
+            createStatChart(${id}, statData, 1200, 320);
         })();
     </script>
 </div>

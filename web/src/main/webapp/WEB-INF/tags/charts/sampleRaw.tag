@@ -14,20 +14,17 @@
         </strong>
     </div>
 
-    <table id="chart${id}" style="width: 100%">
-        <tr>
-            <td>
-                <div id="srtSVG${id}"  class="chart">
-                    <svg></svg>
-                </div>
-            </td>
-            <td class="chart">
-                <div id="rpsSVG${id}"  class="chart">
-                    <svg></svg>
-                </div>
-            </td>
-        </tr>
-    </table>
+    <div id="chart${id}" style="width: 100%; display: none; height: 500px">
+        <div id="load${id}" style="display: none; width: 100%">
+            <img src="/resources/img/loading.gif">
+        </div>
+        <div id="srtSVG${id}" style="height: 280px; width: 1800px">
+            <svg></svg>
+        </div>
+        <div id="rpsSVG${id}" style="height: 280px; width: 1800px">
+            <svg></svg>
+        </div>
+    </div>
 
     <script type="text/javascript">
         (function() {
@@ -54,8 +51,10 @@
                     ]
                 }
             ];
-            createSRTChart(${id}, srtData);
-            createRPSChart(${id}, rpsData);
+            document.getElementById("load${id}").style.display = "block";
+            createSRTChart(${id}, srtData, 1800, 320);
+            createRPSChart(${id}, rpsData, 1800, 320);
+            document.getElementById("load${id}").style.display = "none";
         })();
     </script>
 </div>

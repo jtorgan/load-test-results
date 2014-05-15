@@ -4,11 +4,9 @@ function loadCharts(sampleID, statData, srtData, rpsData) {
     createRPSChart(sampleID, rpsData);
 }
 
-function createStatChart(id, data) {
+function createStatChart(id, data, width, height) {
     nv.addGraph(function() {
-        var width = 800,
-            height = 320,
-            margin = {top: 30, right: 50, bottom: 50, left: 80};
+        var margin = {top: 30, right: 50, bottom: 50, left: 80};
 
         var builds = data[0].values.map(function(d) {return d.x;});
 
@@ -42,11 +40,9 @@ function createStatChart(id, data) {
     });
 }
 
-function createSRTChart(id, data) {
+function createSRTChart(id, data, width, height) {
     nv.addGraph(function() {
-        var width = 800,
-            height = 320,
-            margin = {top: 30, right: 50, bottom: 50, left: 80};
+        var margin = {top: 30, right: 50, bottom: 50, left: 80};
 
         var chart = nv.models.lineChart()
                 .width(width - margin.right - margin.left)
@@ -81,11 +77,9 @@ function createSRTChart(id, data) {
     });
 }
 
-function createRPSChart(id, data) {
+function createRPSChart(id, data, width, height) {
     nv.addGraph(function() {
-        var width = 800,
-            height = 320,
-            margin = {top: 30, right: 50, bottom: 50, left: 80};
+        var margin = {top: 30, right: 50, bottom: 50, left: 80};
 
         var chart = nv.models.lineChart()
                 .width(width - margin.right - margin.left)
