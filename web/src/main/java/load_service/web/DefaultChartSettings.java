@@ -19,7 +19,13 @@ public class DefaultChartSettings {
             if (metric != BaseMetrics.RESPONSE_CODE)
                 deselected.put(metric.getKey(), false);
         }
+    }
 
+    public void setDeselectedMetric(BaseMetrics metric) {
+        deselected.put(metric.getKey(), true);
+    }
+
+    public Map<String, Boolean> getSettings() {
         if(new File(DEFAULT_SETTINGS_PROPERTIES).exists()) {
             Properties props = new Properties();
             try (InputStream input = new FileInputStream(DEFAULT_SETTINGS_PROPERTIES)) {
@@ -35,13 +41,6 @@ public class DefaultChartSettings {
                 io.printStackTrace();
             }
         }
-    }
-
-    public void setDeselectedMetric(BaseMetrics metric) {
-        deselected.put(metric.getKey(), true);
-    }
-
-    public Map<String, Boolean> getSettings() {
         return deselected;
     }
 
