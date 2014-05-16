@@ -95,7 +95,7 @@ public class StatisticController {
     }
 
     @RequestMapping(value = "/saveDefaultSettings", method = RequestMethod.POST)
-    public ResponseEntity showSamplerCharts(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
+    public String showSamplerCharts(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
                                             @RequestParam(value = "min", required = false) Boolean min,
                                             @RequestParam(value = "max", required = false) Boolean max,
                                             @RequestParam(value = "average", required = false) Boolean average,
@@ -105,7 +105,9 @@ public class StatisticController {
         if (max != null) settings.setDeselectedMetric(BaseMetrics.MAX);
         if (average != null) settings.setDeselectedMetric(BaseMetrics.AVERAGE);
         if (line90 != null) settings.setDeselectedMetric(BaseMetrics.LINE90);
-        return settings.storeSettings() ? new ResponseEntity(HttpStatus.OK) : new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        settings.storeSettings();
+
+        return "redirect:/statistic/showStat?buildTypeID=" + buildTypeID;
     }
 
 
