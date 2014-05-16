@@ -9,19 +9,19 @@
 <div id="sample${id}" class="sample sample-hide">
 
     <div id="sampleTitle${id}" class="title-hide" title="Click to show SRT and RPS charts">
-        <strong>
+        <span style="font-size: 110%">
             <base:sampleName threadGroup="${sample.threadGroup}" name="${sample.name}"/>
-        </strong>
+        </span>
     </div>
 
     <div id="chart${id}" style="width: 100%; display: none; height: 500px">
         <div id="load${id}" style="display: none; width: 100%">
             <img src="/resources/img/loading.gif">
         </div>
-        <div id="srtSVG${id}" style="height: 280px; width: 1800px">
+        <div id="srtSVG${id}" style="height: 250px; width: 1800px">
             <svg></svg>
         </div>
-        <div id="rpsSVG${id}" style="height: 280px; width: 1800px">
+        <div id="rpsSVG${id}" style="height: 250px; width: 1800px">
             <svg></svg>
         </div>
     </div>

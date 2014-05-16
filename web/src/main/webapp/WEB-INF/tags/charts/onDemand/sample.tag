@@ -9,9 +9,11 @@
 <div id="sample${id}" class="sample sample-hide">
 
     <div id="sampleTitle${id}" class="title-hide" title="Click to show chart">
-        <strong>
+        <span style="font-size: 110%">
             <base:sampleName threadGroup="${sample.threadGroup}" name="${sample.name}"/>
-        </strong>
+        </span>
+        <%--<strong>--%>
+        <%--</strong>--%>
     </div>
 
     <div id="stat${id}" style="height: 250px; display: none; padding-bottom: 10px">
@@ -19,7 +21,7 @@
             <img src="/resources/img/loading.gif">
         </div>
 
-        <div id="statSVG${id}" style="height: 280px;">
+        <div id="statSVG${id}" style="height: 280px; padding-top: 15px ">
             <svg></svg>
         </div>
     </div>

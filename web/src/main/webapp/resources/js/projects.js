@@ -93,14 +93,14 @@ function removeBuildType(btID) {
         });
 }
 
-function changeMonitoring(me, isStart) {
-    var btID  = $(me).closest("tr").attr("id");
+function changeMonitoring(me, btID) {
+    var startMonitor = $(me).attr("class") == "start-monitor";
     $.ajax({
         type: "post",
         url: "/buildTypes/changeMonitoring",
-        data: {buildTypeID: btID, start: isStart}
+        data: {buildTypeID: btID, start: startMonitor}
     }).done(function () {
-            if (isStart) {
+            if (startMonitor) {
                 $(me).removeClass("start-monitor").addClass("stop-monitor");
             } else {
                 $(me).removeClass("stop-monitor").addClass("start-monitor");

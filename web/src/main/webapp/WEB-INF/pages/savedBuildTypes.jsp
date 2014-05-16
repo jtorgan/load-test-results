@@ -3,6 +3,7 @@
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 
 <%--@elvariable id="saved_bt" type="java.util.List<load_test_service.api.model.BuildType>"--%>
+<%@taglib prefix="base" tagdir="/WEB-INF/tags" %>
 
 <tr>
     <th style="width: 2%">#</th>
@@ -31,15 +32,7 @@
         <c:set value="${num + 1}" var="num"/>
 
         <td style="text-align: center">
-            <input type="hidden" name="isMonitored" value="${bt.monitored}">
-            <c:choose>
-                <c:when test="${bt.monitored}">
-                    <div class="stop-monitor" onclick="changeMonitoring(this, false);"></div>
-                </c:when>
-                <c:otherwise>
-                    <div class="start-monitor" onclick="changeMonitoring(this, true);"></div>
-                </c:otherwise>
-            </c:choose>
+            <base:monitoring-icon buildTypeID="${bt.ID}" isMonitored="${bt.monitored}"/>
         </td>
         <td style="text-align: center">
             <div class="remove" onclick="removeBuildType('${bt.ID}')"></div>

@@ -6,6 +6,8 @@
 <%@taglib prefix="charts" tagdir="/WEB-INF/tags/charts" %>
 <%@taglib prefix="chartsOnDemand" tagdir="/WEB-INF/tags/charts/onDemand" %>
 
+<%@taglib prefix="headers" tagdir="/WEB-INF/tags/headers" %>
+
 <%--@elvariable id="buildType" type="load_test_service.api.model.BuildType"--%>
 <%--@elvariable id="samples" type="java.util.Map<load_test_service.api.statistic.TestID, load_test_service.api.statistic.results.SampleStatistic>"--%>
 <%--@elvariable id="settings" type="load_service.web.DefaultChartSettings"--%>
@@ -24,28 +26,54 @@
     <link rel="stylesheet" href="/resources/css/charts.css">
 
     <script type="text/javascript" src="/resources/js/charts.js"></script>
+    <style>
+        #btInfo {
+            margin: 1%;
+            padding-left: 5px;
+            float: left;
+            width: 98%;
+        }
+        #default_settings {
+            float: left;
+            width: 99%;
+            padding: 1%;
+            border-top: 1px solid #e4e4e4;
+            border-bottom: 1px solid #e4e4e4;
+            background-color: #f0f0f0;
+        }
+
+        .testsTitle {
+            float: left;
+            font-size: 120%;
+            /*border: 1px solid #86a4c3;*/
+            margin: 1.5% 1% 1%;
+            width: 99%;
+            padding: 0 15px;
+        }
+    </style>
 </head>
 <body>
 
 <div id="btInfo">
-    <%--todo: build type info--%>
-    <table>
-        <tr><td>Build configuration</td><td>${buildType.name}</td></tr>
-        <tr><td>Parent project</td><td>${buildType.projectName}</td></tr>
-        <tr><td>Monitoring status</td><td>${buildType.monitored}</td></tr>
-        <tr><td>Last loaded build (ID)</td><td>${buildType.lastBuildID}</td></tr>
-    </table>
+  <headers:btHeader buildType="${buildType}"/>
 </div>
 
 <div id="default_settings">
     <charts:defaultChartSettings buildTypeID="${buildType.ID}" settings="${settings}"/>
 </div>
 
-<c:set var="id" value="1"/>
-<c:forEach var="sample" items="${samples}">
-    <chartsOnDemand:sample id="${id}" sample="${sample.value}" settings="${settings}"/>
-    <c:set var="id" value="${id+1}"/>
-</c:forEach>
+<span class="testsTitle">
+    Tests:
+</span>
+
+<div style="border: 1px solid #86a4c3; margin: 0 1%; float: left; width: 98%">
+    <c:set var="id" value="1"/>
+    <c:forEach var="sample" items="${samples}">
+        <chartsOnDemand:sample id="${id}" sample="${sample.value}" settings="${settings}"/>
+        <c:set var="id" value="${id+1}"/>
+    </c:forEach>
+</div>
+
 
 </body>
 </html>

@@ -1,0 +1,12 @@
+.start-monitor {
+    background: url("/resources/img/start.png") no-repeat;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+.stop-monitor {
+    background: url("/resources/img/stop.png") no-repeat;
+    width: 18px;
+    cursor: pointer;
+    height: 18px;
+}

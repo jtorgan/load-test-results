@@ -4,6 +4,8 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%@taglib prefix="base" tagdir="/WEB-INF/tags" %>
+<%@taglib prefix="headers" tagdir="/WEB-INF/tags/headers" %>
+
 <%@taglib prefix="charts" tagdir="/WEB-INF/tags/charts" %>
 <%@taglib prefix="chartsOnDemand" tagdir="/WEB-INF/tags/charts/onDemand" %>
 
@@ -23,66 +25,34 @@
 
     <link rel="stylesheet" href="/resources/css/charts.css">
     <script type="text/javascript" src="/resources/js/charts.js"></script>
-
     <style>
-        #common {
-            width: 100%;
-            border: 1px solid #d0d0d0;
-        }
-        #common th {
-            background-color: #e5e5e5;
-            text-align: left;
-            padding: 5px 10px;
-        }
-        #buildInfo {
-            width: 35%;
-        }
-        #dependencies {
-            width: 65%;
+        .testsTitle {
+            float: left;
+            font-size: 120%;
+            /*border: 1px solid #86a4c3;*/
+            margin: 1.5% 1% 1%;
+            width: 99%;
+            padding: 0 15px;
         }
     </style>
 </head>
 <body>
 
-<table id="common">
-    <thead>
-    <tr>
-        <th>Build info</th>
-        <th>Dependencies</th>
-    </tr>
-    </thead>
-    <tr>
-        <td id="buildInfo">
-            <table>
-                <tr>
-                    <td>ID</td>
-                    <td>${build.ID.buildID}</td>
-                </tr>
-                <tr>
-                    <td>Build #</td>
-                    <td>${build.buildNumber}</td>
-                </tr>
-                <tr>
-                    <td>Status</td>
-                    <td><base:buildStatus status="${build.status}"/></td>
-                </tr>
-                <tr>
-                    <td>Finish date</td>
-                    <td><base:buildStatus status="${build.finishFormattedDate}"/></td>
-                </tr>
-            </table>
-        </td>
-        <td id="dependencies">
-            <base:dependencies dependencyList="${build.dependencyList}"/>
-        </td>
-    </tr>
-</table>
+    <div>
+       <headers:bHeader build="${build}"/>
+    </div>
 
-<c:set var="id" value="1"/>
-<c:forEach var="sampleRaws" items="${rawResults}">
-    <chartsOnDemand:sampleRaw id="${id}" sample="${sampleRaws.value}"/>
-    <c:set var="id" value="${id+1}"/>
-</c:forEach>
+    <span class="testsTitle">
+        Tests:
+    </span>
+
+    <div style="border: 1px solid #86a4c3; margin: 0 1%; float: left; width: 98%">
+        <c:set var="id" value="1"/>
+        <c:forEach var="sampleRaws" items="${rawResults}">
+            <chartsOnDemand:sampleRaw id="${id}" sample="${sampleRaws.value}"/>
+            <c:set var="id" value="${id+1}"/>
+        </c:forEach>
+    </div>
 
 </body>
 </html>

@@ -101,10 +101,9 @@ public class BuildTypeController {
     @RequestMapping(value = "/builds", method = RequestMethod.GET)
     public String getBuilds(@RequestParam(value = "buildTypeID", required = true) String buildTypeID, ModelMap model) {
         List<TestBuild> builds = service.getAllBuilds(buildTypeID);
-        model.addAttribute("buildTypeID", buildTypeID);
         model.addAttribute("builds", builds);
         model.addAttribute("count", builds.size());
-
+        model.addAttribute("buildType", service.getBuildType(buildTypeID));
         return "builds";
     }
 
