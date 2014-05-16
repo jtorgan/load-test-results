@@ -94,11 +94,8 @@ function calculateStatistic(bID, btID) {
         success: function(){
 //            loadArtifacts(bID, btID);
             loadStatForm(bID, btID);
-            var statCell = $("#" + bID + " .statistic");
-            statCell.html('<form action="/statistic/showRawStat" method="get" target="_blank"> <input type="hidden" name="buildID" value="' + bID +
-                '"> <input type="hidden" name="buildTypeID" value="' + btID + '"> <input type="hidden" name="artifact" value="' + artifact +
-                '"> <a href="javascript:;" onclick="parentNode.submit();" title="Click to show calculated statistic">' + artifact +
-                '</a> </form>');
+            $("#" + bID + " .statistic").html(artifact);
+            $("#" + bID + " .compare").html('<input type="checkbox" name="compBuildID">');
 
         },
         error: function(){

@@ -45,6 +45,11 @@ function createSRTChart(id, data, width, height) {
         var margin = {top: 30, right: 50, bottom: 50, left: 80};
 
         var chart = nv.models.lineChart()
+/*                .tooltip(
+                    function(key, x, y, e, graph) {
+                        return ' time: ' + y + ' ; value: ' + x;
+                    }
+                )*/
                 .width(width - margin.right - margin.left)
                 .height(height - margin.top - margin.bottom)
                 .margin(margin)
@@ -54,7 +59,12 @@ function createSRTChart(id, data, width, height) {
             ;
         chart.xAxis
             .showMaxMin(false)
-            .tickFormat(function(d) { return d3.time.format('%M:%S')(new Date(d)) })
+            .tickFormat(function(d) {
+                if (typeof d == "string") {
+                    return d3.time.format('%M:%S:%L')(new Date(parseInt(d)))
+                }
+                return d3.time.format('%M:%S')(new Date(d));
+            })
         ;
 
         chart.yAxis
@@ -62,10 +72,6 @@ function createSRTChart(id, data, width, height) {
             .axisLabelDistance(40);
 
         chart.forceY([0]);
-
-        chart.tooltipContent(function(key, x, y, e, graph) {
-            return '<p> time: ' + y + ' ; value: ' + x + '</p>';
-        });
 
         d3.select('#srtSVG' + id + ' svg')
             .datum(data)
@@ -91,7 +97,12 @@ function createRPSChart(id, data, width, height) {
             ;
         chart.xAxis
             .showMaxMin(false)
-            .tickFormat(function(d) { return d3.time.format('%M:%S')(new Date(d)) })
+            .tickFormat(function(d) {
+                if (typeof d == "string") {
+                    return d3.time.format('%M:%S:%L')(new Date(parseInt(d)))
+                }
+                return d3.time.format('%M:%S')(new Date(d));
+            })
         ;
 
         chart.yAxis
@@ -99,10 +110,6 @@ function createRPSChart(id, data, width, height) {
             .axisLabelDistance(40);
 
         chart.forceY([0]);
-
-        chart.tooltipContent(function(key, x, y, e, graph) {
-            return '<p> time: ' + y + ' ; value: ' + x + '</p>';
-        });
 
         d3.select('#rpsSVG' + id + ' svg')
             .datum(data)

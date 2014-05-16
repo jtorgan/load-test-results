@@ -11,7 +11,6 @@
     <input type="hidden" name="buildTypeID" value="${buildTypeID}">
     <input type="hidden" name="artifact" value="${artifact}" >
 
-    <%--todo: srt and rps can be shown not only for calculated stat--%>
     <a href="javascript:;" onclick="parentNode.submit();" title="Click to show RPS and STR artifacts">
         <c:choose>
             <c:when test="${not empty linkTest}">

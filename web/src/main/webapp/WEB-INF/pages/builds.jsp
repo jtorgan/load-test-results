@@ -89,7 +89,7 @@
                             </c:forEach>
                         </td>
 
-                        <td style="text-align: center; cursor: default">
+                        <td class="compare" style="text-align: center; cursor: default">
                             <c:if test="${hasStat}">
                                 <input type="checkbox" name="compBuildID">
                             </c:if>
