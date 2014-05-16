@@ -79,7 +79,7 @@ public class StatisticController {
                            ModelMap model) {
         model.put("buildType", service.getBuildType(buildTypeID));
         model.put("samples", service.getStatistic(buildTypeID));
-        model.put("default", new DefaultChartSettings(buildTypeID));
+        model.put("settings", new DefaultChartSettings(buildTypeID));
         return "statistic";
     }
 
