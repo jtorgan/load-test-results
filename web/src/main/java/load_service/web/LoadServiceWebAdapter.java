@@ -161,4 +161,9 @@ public class LoadServiceWebAdapter implements LoadService {
     public Map<TestID, SampleStatistic> getStatistic(@NotNull String buildTypeID) {
         return myService.getStatistic(buildTypeID);
     }
+
+    @Override
+    public Map<TestID, SampleStatistic> getStatistic(@NotNull String buildTypeID, @NotNull String[] buildIDs) {
+        return myService.getStatistic(buildTypeID, buildIDs);
+    }
 }

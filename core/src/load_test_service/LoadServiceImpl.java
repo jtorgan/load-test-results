@@ -29,10 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -362,6 +359,18 @@ public class LoadServiceImpl implements LoadService, TCAnalyzerInnerQuery {
                 Entity buildType = buildTypeManager.getBuildTypeEntity(txn, buildTypeID);
                 if (buildType == null) return Collections.emptyMap();
                 return statistic.getStatistic(buildType);
+            }
+        });
+    }
+
+    @Override
+    public Map<TestID, SampleStatistic> getStatistic(@NotNull final String buildTypeID, @NotNull final String[] buildIDs) {
+        return store.computeInReadonlyTransaction(new StoreTransactionalComputable<Map<TestID, SampleStatistic>>() {
+            @Override
+            public Map<TestID, SampleStatistic> compute(@NotNull StoreTransaction txn) {
+                Entity buildType = buildTypeManager.getBuildTypeEntity(txn, buildTypeID);
+                if (buildType == null) return Collections.emptyMap();
+                return statistic.getStatistic(buildType, Arrays.asList(buildIDs));
             }
         });
     }

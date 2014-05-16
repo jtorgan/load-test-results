@@ -4,6 +4,7 @@
 
 <%--@elvariable id="saved_bt" type="java.util.List<load_test_service.api.model.BuildType>"--%>
 <%@taglib prefix="base" tagdir="/WEB-INF/tags" %>
+<link href="/resources/css/headers.css" rel="stylesheet">
 
 <tr>
     <th style="width: 2%">#</th>
@@ -34,6 +35,7 @@
         <td style="text-align: center">
             <base:monitoring-icon buildTypeID="${bt.ID}" isMonitored="${bt.monitored}"/>
         </td>
+
         <td style="text-align: center">
             <div class="remove" onclick="removeBuildType('${bt.ID}')"></div>
         </td>

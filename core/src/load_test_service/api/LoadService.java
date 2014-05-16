@@ -153,6 +153,8 @@ public interface LoadService {
     @NotNull
     Map<TestID, SampleStatistic> getStatistic(@NotNull final String buildTypeID);
 
+    Map<TestID, SampleStatistic> getStatistic(@NotNull final String buildTypeID, @NotNull final String[] buildIDs);
+
     @NotNull
     Map<TestID, SampleRawResults> getRawStatistic(@NotNull final BuildID buildID, @NotNull final String artifactName);
 

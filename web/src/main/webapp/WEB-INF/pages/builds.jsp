@@ -53,7 +53,14 @@
                    <th>Number</th>
                    <th style="padding: 0 20px; text-align: left;">SRT+RPS with Artifacts</th>
                    <th style="padding: 0 10px; text-align: center !important; width: 90px">Statistic<br/><small>(from artifact)</small></th>
-                   <th style="padding: 0 10px; text-align: center !important;">Compare</th>
+                   <th style="padding: 0 10px; text-align: center !important;">
+                       <form id="compareForm" action="/statistic/compare" method="get" target="_blank">
+                           <input type="hidden" name="buildIDs">
+                           <input type="hidden" name="buildTypeID" value="${buildTypeID}">
+
+                           <input type="button" value="Compare" onclick="submitCompare('${buildTypeID}');">
+                       </form>
+                   </th>
                </tr>
                 <c:set var="i" value="1"/>
                 <c:forEach items="${builds}" var="build">
@@ -84,7 +91,7 @@
 
                         <td style="text-align: center; cursor: default">
                             <c:if test="${hasStat}">
-                                <input id="" type="checkbox" name="compBuildID">
+                                <input type="checkbox" name="compBuildID">
                             </c:if>
                         </td>
                     </tr>
@@ -93,7 +100,6 @@
             </table>
         </div>
     </div>
-
 
     <div class="frame" style="max-height: 90%; height: 90%; padding-bottom: 5px; overflow: visible; width: 35%">
         <div id="statForm" class="frame-block" style="height: 35%"></div>

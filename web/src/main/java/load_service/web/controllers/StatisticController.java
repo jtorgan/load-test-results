@@ -111,4 +111,18 @@ public class StatisticController {
     }
 
 
+    @RequestMapping(value = "/compare", method = RequestMethod.GET)
+    public String compare(@RequestParam(value = "buildTypeID", required = true) String buildTypeID,
+                                    @RequestParam(value = "buildIDs", required = true) String buildIDs,
+                                    ModelMap model) {
+        String[] ids = buildIDs.split(",");
+        if (!buildIDs.isEmpty()) {
+            model.put("samples", service.getStatistic(buildTypeID, ids));
+        }
+        model.put("buildType", service.getBuildType(buildTypeID));
+        model.put("settings", new DefaultChartSettings(buildTypeID));
+
+        return "statistic";
+    }
+
 }

@@ -199,6 +199,44 @@ public class StatisticEntityManager {
         return results;
     }
 
+
+    public Map<TestID, SampleStatistic> getStatistic(@NotNull Entity buildType, @NotNull List<String> buildIDs) {
+        EntityIterable entSamples = buildType.getLinks(BuildTypeEntity.Link.TO_SAMPLES.name());
+        Map<TestID, SampleStatistic> results = new TreeMap<>();
+
+        for (Entity entSample : entSamples) {
+
+            String name = (String) entSample.getProperty(SampleEntity.Property.SAMPLE_NAME.name());
+            String threadGroup = (String) entSample.getProperty(SampleEntity.Property.THREAD_GROUP.name());
+
+            if (name == null || threadGroup == null) {
+                continue;
+            }
+            TestID id = new TestID(threadGroup, name);
+            SampleStatistic sample = results.get(id);
+            if (sample == null) {
+                sample = new SampleStatistic(id);
+                results.put(id, sample);
+            }
+
+            //TODO: rewrite; optimize
+            EntityIterable values = entSample.getLinks(SampleEntity.Link.TO_SAMPLE_VALUE.name());
+            for (Entity entValue : values) {
+                String buildId = (String) entValue.getProperty(SampleValue.Property.BUILD_ID.name());
+                if (buildIDs.contains(buildId)) {
+                    String metric = (String) entValue.getProperty(SampleValue.Property.METRIC.name());
+                    String subMetric = (String) entValue.getProperty(SampleValue.Property.SUB_METRIC.name());
+                    long value = Long.valueOf(entValue.getBlobString(SampleValue.Blob.VALUE.name()));
+
+                    if (subMetric != null && !subMetric.isEmpty())
+                        metric += " ( " + subMetric + " )";
+                    sample.addMetricValue(metric, Long.valueOf(buildId), value);
+                }
+            }
+        }
+        return results;
+    }
+
     @Nullable
     public SampleStatistic getSampleStatistic(@NotNull Entity buildType, @NotNull TestID testID){
         return getStatistic(buildType).get(testID);

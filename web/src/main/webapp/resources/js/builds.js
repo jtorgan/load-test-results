@@ -13,6 +13,14 @@ $(function() {
         loadStatForm(buildID, buildTypeID);
 //        loadArtifacts(buildID, buildTypeID);
     });
+
+    $('td.clickable').bind('click' ,function() {
+        var buildID = $(this).closest("tr").attr("id");
+        var buildTypeID = $("#btID").val();
+        loadBuildInfo(buildID, buildTypeID);
+        loadStatForm(buildID, buildTypeID);
+//        loadArtifacts(buildID, buildTypeID);
+    });
 });
 
 function loadBuildInfo(buildID, buildTypeID) {
@@ -97,4 +105,18 @@ function calculateStatistic(bID, btID) {
             alert('Error happened during calculate load statistic');
         }
     });
+}
+
+
+function submitCompare() {
+    var builds = "";
+    $("input[name=compBuildID]").each(function() {
+        var set = $(this).prop("checked");
+        if (set) {
+            var buildId = $(this).closest("tr").attr("id");
+            builds += buildId + ",";
+        }
+    });
+    $("input[name=buildIDs]").val(builds);
+    $("#compareForm").submit();
 }
